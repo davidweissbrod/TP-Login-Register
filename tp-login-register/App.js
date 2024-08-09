@@ -1,70 +1,46 @@
+import React, { useState } from 'react';
+import { Alert, SafeAreaView, Text, TextInput, TouchableOpacity, StatusBar, StyleSheet, View } from 'react-native';
 
-import { Alert, SafeAreaView } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, TextInput, View } from 'react-native';
-import { useState, useEffect } from 'react';
-import HomeScreen from './src/screens/Home'
-import RegisterScreen from './src/screens/Register'
-import { Link } from '@react-navigation/native';
+const LoginScreen = ({ navigation }) => {
+  const urlLogin = "/api/user/login";
+  const [username, onChangeUsername] = useState('');
+  const [pass, onChangeTextPass] = useState('');
 
-
-export default function App({ navigation }) {
-  const urlLogin = "/api/user/login"
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [text, onChangeText] = useState('')
-  const [pass, onChangeTextPass] = useState('')
-
-  /*useEffect = () =>{
-    const fetchDataLogin = async () => {
-      try {
-        const response = await fetch(urlLogin);
-        const data = await response.json();
-        setUsername(data.data)
-        setPassword(data.data)
-      } catch (e) {
-        console.error('Error:', e);
-      }
-    };
-    fetchDataLogin();
-  }, []*/
-  
-  const handleLogin = () =>{
-    navigation.navigate(HomeScreen);
+  const handleLogin = async () => {
+    navigation.navigate('Home');
   }
-
-  const navigateToRegister = () =>{
-    navigation.navigate(RegisterScreen);
-  }
+  const navigateToRegister = () => {
+    navigation.navigate('Register');
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-    <View style={styles.innerContainer}>
-      <Text style={styles.title}>Login</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={onChangeText}
-        value={text}
-        placeholder='Ingrese el usuario'
-        placeholderTextColor="#aaa"
-      />
-      <TextInput
-        style={styles.input}
-        onChangeText={onChangeTextPass}
-        value={pass}
-        secureTextEntry={true}
-        placeholder='Ingrese la contraseña'
-        placeholderTextColor="#aaa"
-      />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Log In</Text>
-      </TouchableOpacity>
-      <Text style={styles.link} onPress={navigateToRegister}>¿No tenes cuenta?</Text>
-    </View>
-    <StatusBar style="auto" />
-  </SafeAreaView>
+      <View style={styles.innerContainer}>
+        <Text style={styles.title}>Login</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={onChangeUsername}
+          value={username}
+          placeholder='Ingrese el usuario'
+          placeholderTextColor="#aaa"
+        />
+        <TextInput
+          style={styles.input}
+          onChangeText={onChangeTextPass}
+          value={pass}
+          secureTextEntry={true}
+          placeholder='Ingrese la contraseña'
+          placeholderTextColor="#aaa"
+        />
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Log In</Text>
+        </TouchableOpacity>
+        <Text style={styles.link} onPress={navigateToRegister}>¿No tienes cuenta?</Text>
+      </View>
+      <StatusBar style="auto" />
+    </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -108,6 +84,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#007bff',
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 10,
   },
   buttonText: {
     color: '#fff',
@@ -115,9 +92,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   link: {
-    color: '#00000',
+    color: '#007bff',
     fontSize: 16,
     textDecorationLine: 'underline',
     marginTop: 10,
   },
 });
+
+export default LoginScreen;
