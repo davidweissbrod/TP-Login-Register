@@ -32,7 +32,7 @@ const LoginScreen = ({ navigation }) => {
         const result = await response.json();
   
         if (result.success) {
-          const userResponse = await fetch('https://api.example.com/user', {
+          const userResponse = await fetch(urlLogin, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${result.token}`, 
