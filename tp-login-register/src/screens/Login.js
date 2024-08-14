@@ -43,7 +43,7 @@ const LoginScreen = ({ navigation }) => {
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Log In</Text>
         </TouchableOpacity>
-        <Text style={styles.link} onPress={navigateToRegister}>¿No tienes cuenta?</Text>
+        <Text style={styles.link} onPress={navigateToRegister}>¿No tenes cuenta?</Text>
       </View>
       <StatusBar style="auto" />
     </SafeAreaView>

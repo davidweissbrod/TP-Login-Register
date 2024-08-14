@@ -11,7 +11,7 @@ const RegisterScreen = ({ navigation }) =>{
 
     const handleRegister = async () => {
       try {
-        const response = await axios.post('/api/user/register', { name, last_name, username, pass });
+        const response = await axios.post(urlRegister, { name, last_name, username, pass });
         if (response.status === 200) {
           navigation.navigate('Home');
         }
@@ -20,7 +20,7 @@ const RegisterScreen = ({ navigation }) =>{
       }
     };
     const navigateToLogin = () => {
-        navigation.navigate('Login');
+      navigation.navigate('Login');
     };
 
     return(
