@@ -1,53 +1,22 @@
 import React, { useState } from 'react';
-import { useEffect } from 'react';
+import axios from 'axios';
 import { Alert, SafeAreaView, Text, TextInput, TouchableOpacity, StatusBar, StyleSheet, View } from 'react-native';
-
 
 const LoginScreen = ({ navigation }) => {
   const urlLogin = "/api/user/login";
   const [username, onChangeUsername] = useState('');
   const [pass, onChangeTextPass] = useState('');
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(urlLogin);
-        const data = await response.json();
-        
-      } catch (e) {
-        console.error('Error:', e);
-      }
-    };
-    fetchData();
-  }, []);
+
   const handleLogin = async () => {
     try {
-        const response = await fetch(urlLogin, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ username, password }),
-        });
-  
-        const result = await response.json();
-  
-        if (result.success) {
-          const userResponse = await fetch(urlLogin, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${result.token}`, 
-            },
-          });
-  
-          const user = await userResponse.json();
-          navigation.navigate('Home', { user });
-        } else {
-          Alert.alert('Error', 'Login failed. Please check your username and password.');
-        }
-      } catch (error) {
-        Alert.alert('Error', 'An error occurred during login.');
+      const response = await axios.post(urlLogin, { username, pass });
+      if (response.status === 200) {
+        navigation.navigate('Home', { name: 'Ian', last_name: 'Roitman' }); 
       }
-  }
+    } catch (error) {
+      Alert.alert('Usuario o contraseña incorrectos');
+    }
+  };
   const navigateToRegister = () => {
     navigation.navigate('Register');
   };

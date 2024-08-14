@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useEffect } from 'react';
-import { Alert, SafeAreaView, Text, TextInput, TouchableOpacity, StatusBar, StyleSheet, View } from 'react-native';
+import axios from 'axios';
+import { Alert, SafeAreaView, Text, TextInput, TouchableOpacity, StyleSheet, View } from 'react-native';
 
 const RegisterScreen = ({ navigation }) =>{
     const urlRegister = "/api/user/register"
@@ -9,24 +9,16 @@ const RegisterScreen = ({ navigation }) =>{
     const [username, onChangeUsername] = useState('');
     const [pass, onChangeTextPass] = useState('');
 
-    useEffect(() => {
-        const fetchData = async () => {
-          try {
-            const response = await fetch(urlRegister);
-            const data = await response.json();
-          } catch (e) {
-            console.error('Error:', e);
-          }
-        };
-        fetchData();
-      }, []);
-
     const handleRegister = async () => {
-        navigation.navigate('Home', {
-            name: name,
-            last_name: last_name
-        });
-    }
+      try {
+        const response = await axios.post('/api/user/register', { name, last_name, username, pass });
+        if (response.status === 200) {
+          navigation.navigate('Home');
+        }
+      } catch (error) {
+        Alert.alert('Error al registrarse');
+      }
+    };
     const navigateToLogin = () => {
         navigation.navigate('Login');
     };
