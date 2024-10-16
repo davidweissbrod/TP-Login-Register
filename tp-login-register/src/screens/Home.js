@@ -1,54 +1,111 @@
 import React from 'react';
-import { SafeAreaView, Text, StyleSheet, View } from 'react-native';
+import Card from '../components/Card';
+import { SafeAreaView,Text, StyleSheet, View } from 'react-native';
+import { AuthContext } from '../../context/auth';
+import { getEvents } from '../../services/events';
+export default function HomeScreen() {
+    const { user, signOut } = useContext(AuthContext);
+    const [events, setEvents] = useState([]);
+  
+    const fetchEvents = async () => {
+      const fetchedEvents = await getEvents();
+      setEvents(fetchedEvents || []);
+    };
 
-const HomeScreen = ({ route }) => {
-    const user = route.params
+    useEffect(() => {
+      fetchEvents();
+    }, []);
+  
     return (
-        <SafeAreaView style={styles.container}>
-            <View style = {styles.innerContainer}>
-                <Text style = {styles.welcome}> Bienvenido!</Text>
-                <Text style = {styles.name}> {user.name}</Text>
-                <Text style = {styles.last}> {user.last_name}</Text>
-            </View>
-        </SafeAreaView>
-    )
-}
-const styles = StyleSheet.create({
+      <SafeAreaView style={styles.container}>
+        <View style={styles.card}>
+          <Text style={styles.user}>{`${user.first_name} ${user.last_name}`}</Text>
+          <Text style={styles.email}>{user.username}</Text>
+        </View>
+        <View style={styles.scrollContainer}>
+          <ScrollView
+            style={styles.scrollView}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            bounces={false}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollViewContent}
+          >
+            {events && events.length > 0 ? ( 
+              events.map((event) => (
+                <Card key={event.id} event={event} />
+              ))
+            ) : (
+              <Text style={styles.noEvents}>No hay eventos disponibles.</Text>
+            )}
+          </ScrollView>
+        </View>
+        <Button variant='primary' onPress={signOut} style={styles.button}>Log out</Button>
+      </SafeAreaView>
+    );
+  }
+  const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#f5f5f5',
+      flex: 1,
+      backgroundColor: '#f5f5f5',
+      padding: 20,
+    },
+    card: {
+      backgroundColor: '#fff',
+      borderRadius: 12,
+      padding: 20,
+      marginBottom: 20,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 6,
+      elevation: 5,
+    },
+    user: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: '#333',
+    },
+    email: {
+      fontSize: 16,
+      color: '#777',
+      marginTop: 5,
+    },
+    scrollContainer: {
+      flex: 1,
+      marginTop: 20,
+    },
+    scrollView: {
+      flexGrow: 1,
+    },
+    scrollViewContent: {
+      paddingVertical: 10,
+      paddingHorizontal: 5,
+    },
+    noEvents: {
+      fontSize: 18,
+      color: '#999',
+      textAlign: 'center',
+      marginTop: 20,
+    },
+    button: {
+        backgroundColor: '#1E90FF',
+        borderRadius: 8,
+        paddingVertical: 15,
         justifyContent: 'center',
         alignItems: 'center',
-      },
-      innerContainer: {
-        width: '80%',
-        backgroundColor: '#fff',
-        padding: 20,
-        borderRadius: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
+        marginTop: 30,
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowRadius: 3.84,
         elevation: 5,
-        alignItems: 'center',
-      },
-      welcome: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 20,
-      },
-    name: {
-        fontSize: 22,
-        fontWeight: '600',
-        color: '#333',
-        marginBottom: 10,
-    },
-    last: {
-        fontSize: 20,
-        fontWeight: '400',
-        color: '#555',
-    },
-});
-
-export default HomeScreen
+      }
+  });
+  

@@ -1,110 +1,124 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { Alert, SafeAreaView, Text, TextInput, TouchableOpacity, StatusBar, StyleSheet, View } from 'react-native';
+import React, { useState, useContext } from "react";
+import { StyleSheet, Text, View, TextInput, Alert } from "react-native";
+import { useNavigation } from '@react-navigation/native';
+import Button from 'react-bootstrap'   
+import { AuthContext } from "../../context/auth";
 
-const LoginScreen = ({ navigation }) => {
-  const urlLogin = "/api/user/login";
-  const [username, onChangeUsername] = useState('');
-  const [pass, onChangeTextPass] = useState('');
+export default function LoginScreen() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigation = useNavigation(); 
+  const { login } = useContext(AuthContext);
 
-  const handleLogin = async () => {
-    try {
-      const response = await axios.post(urlLogin, { username, pass });
-      if (response.status === 200) {
-        navigation.navigate('Home', { name: 'Ian', last_name: 'Roitman' }); 
-      }
-    } catch (error) {
-      Alert.alert('Usuario o contraseña incorrectos');
-    }
-  };
-  const navigateToRegister = () => {
+  const handleRegisterNavigation = () => {
     navigation.navigate('Register');
+  }
+
+  const handleLogin = async () => { 
+    if (email && password) {
+      const res = await login(email, password);
+      if(res.success){
+        Alert.alert(
+          'Success',
+          `${email} logeado correctamente`, 
+          [{ text: 'OK'}],
+          { cancelable: false }
+        );
+      }
+      else{
+        Alert.alert(
+          'Error',
+          `${res.message}`,
+          [{ text: 'OK'}],
+          { cancelable: false }
+        );
+      }
+    }
+
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.innerContainer}>
-        <Text style={styles.title}>Login</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={onChangeUsername}
-          value={username}
-          placeholder='Ingrese el usuario'
-          placeholderTextColor="#aaa"
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={onChangeTextPass}
-          value={pass}
-          secureTextEntry={true}
-          placeholder='Ingrese la contraseña'
-          placeholderTextColor="#aaa"
-        />
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Log In</Text>
-        </TouchableOpacity>
-        <Text style={styles.link} onPress={navigateToRegister}>¿No tenes cuenta?</Text>
-      </View>
-      <StatusBar style="auto" />
-    </SafeAreaView>
+    <View style={styles.container}>
+      <Text style={styles.title}>Login</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="example@email.com"
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="contraseña"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry={true}
+      />
+
+      <Text style={styles.noCuenta} onPress={handleRegisterNavigation}>¿No tienes cuenta?</Text>
+      <Button variant="primary" onPress={handleLogin} style={styles.buttonLogin}>Log in</Button>
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  innerContainer: {
-    width: '80%',
-    backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
   },
   title: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 20,
     color: '#333',
+    marginBottom: 20,
   },
   input: {
     width: '100%',
-    padding: 15,
+    height: 50,
+    backgroundColor: '#fff',
     borderRadius: 8,
+    paddingHorizontal: 15,
+    marginVertical: 10,
+    borderColor: '#ccc',
     borderWidth: 1,
-    borderColor: '#ddd',
-    marginBottom: 15,
-    backgroundColor: '#fafafa',
     fontSize: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  button: {
-    width: '100%',
-    padding: 15,
-    borderRadius: 8,
-    backgroundColor: '#007bff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  link: {
-    color: '#007bff',
-    fontSize: 16,
+  noCuenta: {
+    fontSize: 14,
+    color: '#1E90FF',
+    marginVertical: 15,
     textDecorationLine: 'underline',
-    marginTop: 10,
   },
+  buttonLogin: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#1E90FF',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  buttonLoginText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  }
 });
-
-export default LoginScreen;

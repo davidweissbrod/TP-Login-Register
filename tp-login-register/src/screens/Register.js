@@ -1,23 +1,33 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { Alert, SafeAreaView, Text, TextInput, TouchableOpacity, StyleSheet, View } from 'react-native';
 
 const RegisterScreen = ({ navigation }) =>{
-    const urlRegister = "/api/user/register"
     const [name, onChangeName] = useState('')
     const [last_name, onChangeLastName] = useState('')
-    const [username, onChangeUsername] = useState('');
+    const [email, onChangeEmail] = useState('');
     const [pass, onChangeTextPass] = useState('');
+    const { register } = useContext(AuthContext);
 
     const handleRegister = async () => {
-      try {
-        const response = await axios.post(urlRegister, { name, last_name, username, pass });
-        if (response.status === 200) {
-          navigation.navigate('Home');
+      if (email && pass && name && last_name) {
+        let res = await register(email, pass, name, last_name);
+        if(res.success){
+          Alert.alert(
+            'Success',
+            `${email} registrado`, 
+            [{ text: 'OK'}],
+            { cancelable: false }
+          );
         }
-      } catch (error) {
-        Alert.alert('Error al registrarse');
-      }
+        else{
+          Alert.alert(
+            'Error',
+            `${res.message}`,
+            [{ text: 'OK'}],
+            { cancelable: false }
+            )
+        }
+        }
     };
     const navigateToLogin = () => {
       navigation.navigate('Login');
@@ -122,4 +132,4 @@ const styles = StyleSheet.create({
       },
 });
 
-  export default RegisterScreen
+export default RegisterScreen
