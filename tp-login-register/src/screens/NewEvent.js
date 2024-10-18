@@ -3,7 +3,7 @@ import { View, Text, TextInput, StyleSheet, Alert, ScrollView, Modal, Switch } f
 import { Picker } from '@react-native-picker/picker';
 import { AuthContext } from '../../context/auth';
 import { getCategorias, getLocations, createEvent } from '../../services/events';
-import Button from 'react-bootstrap'
+
 
 export default function NuevoEvento() {
   const { token } = useContext(AuthContext);
@@ -138,7 +138,7 @@ export default function NuevoEvento() {
           />
         </View>
 
-        <Button variant='primary' onPress={handleSubmit} style={styles.buttonSubmit}></Button>
+        <button variant='primary' onPress={handleSubmit} style={styles.buttonSubmit}></button>
 
         <Modal
           transparent={true}
@@ -158,8 +158,8 @@ export default function NuevoEvento() {
               <Text>Inscripción habilitada: {form.enabled_for_enrollment ? 'Sí' : 'No'}</Text>
               <Text>Máxima asistencia: {form.max_assistance}</Text>
               <View style={styles.modalButtons}>
-                <Button variant='danger' onPress={cancelEvent} > Cancelar </Button>
-                <Button variant='primary' onPress={confirmEvent}>Confirmar</Button>
+                <button variant='danger' onPress={cancelEvent} > Cancelar </button>
+                <button variant='primary' onPress={confirmEvent}>Confirmar</button>
               </View>
             </View>
           </View>

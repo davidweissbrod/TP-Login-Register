@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Alert, SafeAreaView, Text, TextInput, TouchableOpacity, StyleSheet, View } from 'react-native';
+import { AuthContext } from '../../context/auth';
 
-const RegisterScreen = ({ navigation }) =>{
+export default function RegisterScreen({ navigation }){
     const [name, onChangeName] = useState('')
     const [last_name, onChangeLastName] = useState('')
     const [email, onChangeEmail] = useState('');
@@ -53,9 +54,9 @@ const RegisterScreen = ({ navigation }) =>{
             />
             <TextInput 
              style = {styles.input}
-             value={username}
-             onChangeText={onChangeUsername}
-             placeholder='Ingrese un usuario'
+             value={email}
+             onChangeText={onChangeEmail}
+             placeholder='Ingrese un email'
              placeholderTextColor="#aaa"
             />
             <TextInput 
@@ -132,4 +133,3 @@ const styles = StyleSheet.create({
       },
 });
 
-export default RegisterScreen

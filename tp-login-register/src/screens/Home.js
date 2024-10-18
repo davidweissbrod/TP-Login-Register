@@ -40,7 +40,7 @@ export default function HomeScreen() {
             )}
           </ScrollView>
         </View>
-        <Button variant='primary' onPress={signOut} style={styles.button}>Log out</Button>
+        <button variant='primary' onPress={signOut} style={styles.button}>Log out</button>
       </SafeAreaView>
     );
   }

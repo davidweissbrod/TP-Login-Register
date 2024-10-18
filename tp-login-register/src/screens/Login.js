@@ -1,14 +1,14 @@
 import React, { useState, useContext } from "react";
 import { StyleSheet, Text, View, TextInput, Alert } from "react-native";
-import { useNavigation } from '@react-navigation/native';
-import Button from 'react-bootstrap'   
+import { useNavigation } from '@react-navigation/native'; 
 import { AuthContext } from "../../context/auth";
+import { Button } from 'react-native';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation(); 
-  const { login } = useContext(AuthContext);
+  const { signIn } = useContext(AuthContext);
 
   const handleRegisterNavigation = () => {
     navigation.navigate('Register');
@@ -16,7 +16,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => { 
     if (email && password) {
-      const res = await login(email, password);
+      const res = await signIn(email, password);
       if(res.success){
         Alert.alert(
           'Success',
@@ -55,7 +55,7 @@ export default function LoginScreen() {
       />
 
       <Text style={styles.noCuenta} onPress={handleRegisterNavigation}>¿No tienes cuenta?</Text>
-      <Button variant="primary" onPress={handleLogin} style={styles.buttonLogin}>Log in</Button>
+      <Button title="Log in" onPress={handleLogin} style={styles.buttonLogin}/>
     </View>
   );
 }

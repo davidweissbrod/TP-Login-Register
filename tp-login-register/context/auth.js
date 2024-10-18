@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { loginUser, validateToken, registerUser} from '../services/Users'
+import { loginUser, validateToken, registerUser} from '../services/users.js'
 
 export const AuthContext = createContext();
 
