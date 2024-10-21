@@ -3,6 +3,8 @@ import Card from '../components/Card';
 import { SafeAreaView,Text, StyleSheet, View } from 'react-native';
 import { AuthContext } from '../../context/auth';
 import { getEvents } from '../../services/events';
+import { Button } from 'react-native';
+
 export default function HomeScreen() {
     const { user, signOut } = useContext(AuthContext);
     const [events, setEvents] = useState([]);
@@ -40,7 +42,7 @@ export default function HomeScreen() {
             )}
           </ScrollView>
         </View>
-        <button variant='primary' onPress={signOut} style={styles.button}>Log out</button>
+        <Button onPress={signOut} style={styles.button}>Log out</Button>
       </SafeAreaView>
     );
   }

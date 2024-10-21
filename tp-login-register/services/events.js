@@ -71,4 +71,34 @@ export const createEvent = async (eventDetails, token) => {
               }
             : { status: 500, message: 'Error de conexión.' };
     }
+
 }
+
+export const getEventById = async (eventId, token) => {
+    try {
+      const response = await axios.get(`${API_URL}/event/${eventId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error obteniendo el evento:', error);
+      throw error;
+    }
+}
+
+export const updateEvent = async (eventId, updatedEventData, token) => {
+    try {
+      const response = await axios.put(`${BASE_URL}/events/${eventId}`, updatedEventData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error actualizando el evento:', error);
+      throw error;
+    }
+  }

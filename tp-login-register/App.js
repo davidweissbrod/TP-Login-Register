@@ -1,24 +1,58 @@
 import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import LoginScreen from './src/screens/Login.js';
-import HomeScreen from './src/screens/Home.js';
-import RegisterScreen from './src/screens/Register.js'; 
-import NewEventScreen from './src/screens/NewEvent.js'
-import { Auth } from './context/auth.js'
+import Icon from 'react-native-vector-icons/Ionicons'; 
+import HomeScreen from './src/screens/Home';
+import NuevoEventoScreen from './src/screens/NewEvent';
+import EditarEventoScreen from './src/screens/EditEvent';
+import LoginScreen from './src/screens/Login';
+import RegisterScreen from './src/screens/Register';
+import { Auth } from './context/auth';
 
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator(); 
 
-export default function App() {
+function TabNavigator() {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ color, size }) => {
+          let iconName;
+
+          if (route.name === 'Home') {
+            iconName = 'home-outline';
+          } else if (route.name === 'Nuevo Evento') {
+            iconName = 'add-circle-outline';
+          } else if (route.name === 'Editar Evento') {
+            iconName = 'create-outline';
+          }
+          return <Icon name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: '#007aff', 
+        tabBarInactiveTintColor: 'gray',   
+        tabBarStyle: {
+          paddingBottom: 5,
+          height: 60, 
+        },
+      })}
+    >
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Nuevo Evento" component={NuevoEventoScreen} />
+      <Tab.Screen name="Editar Evento" component={EditarEventoScreen} />
+    </Tab.Navigator>
+  );
+}
+
+export default function AppNavigator() {
   return (
     <Auth>
       <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="Nuevo Evento" component={NewEventScreen} />
-      </Stack.Navigator>
+        <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+          <Stack.Screen name="HomeTabs" component={TabNavigator} />
+        </Stack.Navigator>
       </NavigationContainer>
     </Auth>
   );

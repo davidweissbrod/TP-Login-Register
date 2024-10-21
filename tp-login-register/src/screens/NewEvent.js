@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet, Alert, ScrollView, Modal, Switch } f
 import { Picker } from '@react-native-picker/picker';
 import { AuthContext } from '../../context/auth';
 import { getCategorias, getLocations, createEvent } from '../../services/events';
+import { Button } from 'react-native';
 
 
 export default function NuevoEvento() {
@@ -35,7 +36,6 @@ export default function NuevoEvento() {
         console.error( error)
       }
     };
-
     fetchData();
   }, []);
 
@@ -138,7 +138,7 @@ export default function NuevoEvento() {
           />
         </View>
 
-        <button variant='primary' onPress={handleSubmit} style={styles.buttonSubmit}></button>
+        <Button onPress={handleSubmit} style={styles.buttonSubmit}></Button>
 
         <Modal
           transparent={true}
@@ -158,8 +158,8 @@ export default function NuevoEvento() {
               <Text>Inscripción habilitada: {form.enabled_for_enrollment ? 'Sí' : 'No'}</Text>
               <Text>Máxima asistencia: {form.max_assistance}</Text>
               <View style={styles.modalButtons}>
-                <button variant='danger' onPress={cancelEvent} > Cancelar </button>
-                <button variant='primary' onPress={confirmEvent}>Confirmar</button>
+                <Button onPress={cancelEvent} > Cancelar </Button>
+                <Button onPress={confirmEvent}>Confirmar</Button>
               </View>
             </View>
           </View>
@@ -172,14 +172,14 @@ const styles = StyleSheet.create({
     scrollContainer: {
       flexGrow: 1,
       padding: 20,
-      backgroundColor: '#f5f5f5',
+      backgroundColor: '#f5f5f5'
     },
     title: {
       fontSize: 24,
       fontWeight: 'bold',
       color: '#333',
       marginBottom: 20,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     input: {
       backgroundColor: '#fff',
@@ -189,24 +189,24 @@ const styles = StyleSheet.create({
       color: '#333',
       marginBottom: 15,
       borderWidth: 1,
-      borderColor: '#ccc',
+      borderColor: '#ccc'
     },
     picker: {
       backgroundColor: '#fff',
       borderRadius: 8,
       marginBottom: 15,
       borderWidth: 1,
-      borderColor: '#ccc',
+      borderColor: '#ccc'
     },
     switchContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 15,
+      marginBottom: 15
     },
     header: {
       fontSize: 16,
-      color: '#333',
+      color: '#333'
     },
     buttonSubmit: {
       backgroundColor: '#1E90FF',
@@ -218,41 +218,41 @@ const styles = StyleSheet.create({
       shadowColor: "#000",
       shadowOffset: {
         width: 0,
-        height: 2,
+        height: 2
       },
       shadowOpacity: 0.1,
       shadowRadius: 3.84,
-      elevation: 5,
+      elevation: 5
     },
     modalContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)'
     },
     modalContent: {
       width: '90%',
       backgroundColor: '#fff',
       borderRadius: 10,
       padding: 20,
-      alignItems: 'center',
+      alignItems: 'center'
     },
     modalTitle: {
       fontSize: 20,
       fontWeight: 'bold',
       color: '#333',
-      marginBottom: 15,
+      marginBottom: 15
     },
     modalButtons: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       width: '100%',
-      marginTop: 20,
+      marginTop: 20
     },
     buttonText: {
       color: '#fff',
       fontSize: 16,
-      fontWeight: 'bold',
+      fontWeight: 'bold'
     },
   });
   
