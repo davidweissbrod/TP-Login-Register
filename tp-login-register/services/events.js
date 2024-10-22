@@ -4,7 +4,7 @@ const API_URL = 'https://localhost:3000';
 
 export const getEvents = async (page = 1) => {
     try {
-        const response = await axios.get(`${API_URL}/api/event`, { params: { page: page } });
+        const response = await axios.get(`${API_URL}/event`, { params: { page: page } });
         
         return response.data[0].events; 
 
@@ -16,7 +16,7 @@ export const getEvents = async (page = 1) => {
 
 export const getCategorias = async () => {
     try {
-        const response = await axios.get(`${API_URL}/api/event-category`);
+        const response = await axios.get(`${API_URL}/event-category`);
         return response.data
     }
     catch (error){
@@ -27,7 +27,7 @@ export const getCategorias = async () => {
 
 export const getLocations = async (token) => {
     try{       
-        const response = await axios.get(`${API_URL}/api/event-location`, {
+        const response = await axios.get(`${API_URL}/event-location`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -42,7 +42,7 @@ export const getLocations = async (token) => {
 
 export const createEvent = async (eventDetails, token) => {
     try {
-        const response = await axios.post(`${API_URL}/api/event`, {
+        const response = await axios.post(`${API_URL}/event`, {
             name: eventDetails.name,
             description: eventDetails.description,
             id_event_category: eventDetails.id_event_category,
@@ -90,7 +90,7 @@ export const getEventById = async (eventId, token) => {
 
 export const updateEvent = async (eventId, updatedEventData, token) => {
     try {
-      const response = await axios.put(`${BASE_URL}/events/${eventId}`, updatedEventData, {
+      const response = await axios.put(`${API_URL}/event/${eventId}`, updatedEventData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',

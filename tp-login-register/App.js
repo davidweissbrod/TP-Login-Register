@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import HomeScreen from './src/screens/Home';
 import NuevoEventoScreen from './src/screens/NewEvent';
 import EditarEventoScreen from './src/screens/EditEvent';
+import DetalleEventoScreen from './src/screens/DetailEvent';
 import LoginScreen from './src/screens/Login';
 import RegisterScreen from './src/screens/Register';
 import { Auth } from './context/auth';
@@ -22,10 +23,8 @@ function TabNavigator() {
 
           if (route.name === 'Home') {
             iconName = 'home-outline';
-          } else if (route.name === 'Nuevo Evento') {
+          } else if (route.name === 'NewEvent') {
             iconName = 'add-circle-outline';
-          } else if (route.name === 'Editar Evento') {
-            iconName = 'create-outline';
           }
           return <Icon name={iconName} size={size} color={color} />;
         },
@@ -39,7 +38,6 @@ function TabNavigator() {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Nuevo Evento" component={NuevoEventoScreen} />
-      <Tab.Screen name="Editar Evento" component={EditarEventoScreen} />
     </Tab.Navigator>
   );
 }
@@ -51,6 +49,8 @@ export default function AppNavigator() {
         <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
+          <Stack.Screen name="DetailEvent" component={DetalleEventoScreen} />
+          <Stack.Screen name="EditEvent" component={EditarEventoScreen} />
           <Stack.Screen name="HomeTabs" component={TabNavigator} />
         </Stack.Navigator>
       </NavigationContainer>

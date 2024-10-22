@@ -1,18 +1,22 @@
 import React from 'react';
 import Card from '../components/Card';
-import { SafeAreaView,Text, StyleSheet, View } from 'react-native';
+import { SafeAreaView, Text, StyleSheet, View } from 'react-native';
 import { AuthContext } from '../../context/auth';
 import { getEvents } from '../../services/events';
 import { Button } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function HomeScreen() {
     const { user, signOut } = useContext(AuthContext);
     const [events, setEvents] = useState([]);
+    const navigation = useNavigation();
   
     const fetchEvents = async () => {
       const fetchedEvents = await getEvents();
-      setEvents(fetchedEvents || []);
-    };
+      const fechaHoy = new Date();
+      const events = fetchedEvents.filter(event => new Date(event.start_date) > fechaHoy);
+      setEvents(events);
+  };
 
     useEffect(() => {
       fetchEvents();
@@ -22,7 +26,6 @@ export default function HomeScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.card}>
           <Text style={styles.user}>{`${user.first_name} ${user.last_name}`}</Text>
-          <Text style={styles.email}>{user.username}</Text>
         </View>
         <View style={styles.scrollContainer}>
           <ScrollView
@@ -34,18 +37,24 @@ export default function HomeScreen() {
             contentContainerStyle={styles.scrollViewContent}
           >
             {events && events.length > 0 ? ( 
-              events.map((event) => (
-                <Card key={event.id} event={event} />
-              ))
-            ) : (
-              <Text style={styles.noEvents}>No hay eventos disponibles.</Text>
-            )}
+            events.map((event) => (
+              <Card 
+                key={event.id} 
+                event={event} 
+                onPressEdit={() => navigation.navigate('EditEvent', { eventId: event.id })}
+                onPressDetail={() => navigation.navigate('DetailEvent', {eventId: event.id})}
+              />
+            ))
+          ) : (
+            <Text>No hay eventos proximos</Text>
+          )}
           </ScrollView>
         </View>
         <Button onPress={signOut} style={styles.button}>Log out</Button>
       </SafeAreaView>
     );
   }
+  
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -71,11 +80,6 @@ export default function HomeScreen() {
       fontWeight: 'bold',
       color: '#333',
     },
-    email: {
-      fontSize: 16,
-      color: '#777',
-      marginTop: 5,
-    },
     scrollContainer: {
       flex: 1,
       marginTop: 20,
@@ -86,12 +90,6 @@ export default function HomeScreen() {
     scrollViewContent: {
       paddingVertical: 10,
       paddingHorizontal: 5,
-    },
-    noEvents: {
-      fontSize: 18,
-      color: '#999',
-      textAlign: 'center',
-      marginTop: 20,
     },
     button: {
         backgroundColor: '#1E90FF',
