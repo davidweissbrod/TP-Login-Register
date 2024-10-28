@@ -101,4 +101,41 @@ export const updateEvent = async (eventId, updatedEventData, token) => {
       console.error('Error actualizando el evento:', error);
       throw error;
     }
-  }
+}
+
+export const deleteEvent = async (eventId, token) => {
+    try {
+        const response = await axios.delete(`${API_URL}/event/${eventId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return {
+            status: response.status,
+            message: 'Evento eliminado con éxito',
+        };
+    } catch (error) {
+        console.error('Error eliminando el evento:', error);
+        return error.response
+            ? {
+                status: error.response.status,
+                message: error.response.data.message || 'Error al eliminar el evento',
+            }
+            : { status: 500, message: 'Error de conexión.' };
+    }
+}
+
+//Esto no esta terminado hacer bien despues
+export const getEventParticipants = async (eventId, token) => {
+    try {
+        const response = await axios.get(`${API_URL}/event/${eventId}/participants`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data.user;
+    } catch (error) {
+        console.error('Error obteniendo participantes del evento:', error);
+        return error.response ? error.response.data : null;
+    }
+};
