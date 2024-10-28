@@ -16,7 +16,7 @@ export default function HomeScreen() {
       const fechaHoy = new Date();
       const events = fetchedEvents.filter(event => new Date(event.start_date) > fechaHoy);
       setEvents(events);
-  };
+    };
 
     useEffect(() => {
       fetchEvents();

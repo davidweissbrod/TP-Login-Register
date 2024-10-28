@@ -10,6 +10,8 @@ export default function DetalleEvento({ route }) {
   const { eventId } = route.params;
   const { token } = useContext(AuthContext);
   const [event, setEvent] = useState(null);
+  const [participants, setParticipants] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchEvent = async () => {
