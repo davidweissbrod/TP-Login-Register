@@ -125,29 +125,30 @@ export const deleteEvent = async (eventId, token) => {
     }
 }
 
-export const getEventParticipants = async (eventId, token) => {
+export const getEventParticipants = async (eventId) => {
     try {
         const response = await axios.get(`${API_URL}/event/${eventId}/event_enrollments`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
+            headers: { }
         });
 
-        // Suponiendo que el backend devuelve los datos en el campo `eventEnrollments`
-        const participantsData = response.data.event_enrollments.map(enrollment => ({
-            id: enrollment.id_user,
-            registration_date: enrollment.registration_date_time,
-            attended: enrollment.attended,
-            observations: enrollment.observations,
-            rating: enrollment.rating,
-            first_name: enrollment.user.first_name || '',
-            last_name: enrollment.user.last_name || '',
-            username: enrollment.user.username || ''
-        }));
-
+        const participantsData = response.data
         return participantsData;
     } catch (error) {
         console.error('Error obteniendo participantes del evento:', error);
         return error.response ? error.response.data : null;
     }
 };
+
+export const enrollUser = async (id_event, token) => {
+    try {       
+        const response = await axios.post(`${API_URL}/api/event/enrollment/${id_event}`,{}, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error('Error en enrollUser:', error.message || error);
+        return error.response ? error.response.data : null;
+    }
+}

@@ -4,7 +4,7 @@ const API_URL = 'https://localhost:3000';
 
 export const loginUser = async (username, password) => {
     try {
-      const response = await axios.post(`${API_URL}/api/user/login`, {
+      const response = await axios.post(`${API_URL}/user/login`, {
         username: username,
         password: password
       });
@@ -18,7 +18,7 @@ export const loginUser = async (username, password) => {
 
   export const registerUser = async (userData) => {
     try {
-      const response = await axios.post(`${API_URL}/api/user/register`, {
+      const response = await axios.post(`${API_URL}/user/register`, {
         first_name: userData.first_name,
         last_name: userData.last_name,
         username: userData.username,
@@ -47,7 +47,7 @@ export const loginUser = async (username, password) => {
 export const validateToken = async (token) => {
     try 
     {
-        const response = await axios.get(`${API_URL}/api/user/validartoken`, {
+        const response = await axios.get(`${API_URL}/user/validartoken`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

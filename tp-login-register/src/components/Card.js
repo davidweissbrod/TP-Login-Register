@@ -1,19 +1,20 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-export default function Card({ event, onPressEdit, onPressDetail }) {
+export default function Card({ event, type }) {
+
+  const handleNavigationDetail = () => {
+    navigation.navigate('DetalleEvento', { eventId, fromScreen: type });
+  };
+
   return (
     <View style={styles.card}>
       <Text style={styles.title}>{event.name}</Text>
       <Text style={styles.price}>${event.price}</Text>
       <Text style={styles.location}>{event.event_location.name}</Text>
       
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={onPressEdit} style={styles.button}>
-          <Text style={styles.buttonText}>Editar Evento</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity onPress={onPressDetail} style={styles.buttonDetail}>
+      <View style={styles.buttonContainer}> 
+        <TouchableOpacity onPress={handleNavigationDetail} style={styles.buttonDetail}>
           <Text style={styles.buttonText}>Ver Detalles</Text>
         </TouchableOpacity>
       </View>

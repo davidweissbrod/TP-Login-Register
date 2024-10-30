@@ -4,18 +4,16 @@ import { SafeAreaView, Text, StyleSheet, View } from 'react-native';
 import { AuthContext } from '../../context/auth';
 import { getEvents } from '../../services/events';
 import { Button } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 
 export default function HomeScreen() {
     const { user, signOut } = useContext(AuthContext);
     const [events, setEvents] = useState([]);
-    const navigation = useNavigation();
   
     const fetchEvents = async () => {
       const fetchedEvents = await getEvents();
       const fechaHoy = new Date();
       const events = fetchedEvents.filter(event => new Date(event.start_date) > fechaHoy);
-      setEvents(events);
+      setEvents(events || []);
     };
 
     useEffect(() => {
@@ -36,18 +34,17 @@ export default function HomeScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollViewContent}
           >
-            {events && events.length > 0 ? ( 
-            events.map((event) => (
-              <Card 
-                key={event.id} 
-                event={event} 
-                onPressEdit={() => navigation.navigate('EditEvent', { eventId: event.id })}
-                onPressDetail={() => navigation.navigate('DetailEvent', {eventId: event.id})}
-              />
-            ))
+          {events && events.length > 0 ? (
+          events.map((event) => {
+            if (event.creator_user.username !== user.username) {
+              return  <Card key={event.id} event={event} type={'Home'} />;; 
+            }
+            return <Card key={event.id} event={event} type={'Admin'} />;
+          })
           ) : (
-            <Text>No hay eventos proximos</Text>
+            <Text style={styles.text}>No hay eventos disponibles.</Text>
           )}
+
           </ScrollView>
         </View>
         <Button onPress={signOut} style={styles.button}>Log out</Button>

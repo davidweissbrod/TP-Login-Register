@@ -10,6 +10,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const navigation = useNavigation(); 
   const { signIn } = useContext(AuthContext);
+  
 
   const handleRegisterNavigation = () => {
     navigation.navigate('Register');

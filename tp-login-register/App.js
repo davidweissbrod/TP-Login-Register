@@ -10,6 +10,7 @@ import DetalleEventoScreen from './src/screens/DetailEvent';
 import LoginScreen from './src/screens/Login';
 import RegisterScreen from './src/screens/Register';
 import { Auth } from './context/auth';
+import { StatusBar } from 'react-native';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator(); 
@@ -17,6 +18,7 @@ const Tab = createBottomTabNavigator();
 function TabNavigator() {
   return (
     <Tab.Navigator
+      initialRouteName="Home"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName;
@@ -45,6 +47,7 @@ function TabNavigator() {
 export default function AppNavigator() {
   return (
     <Auth>
+      <StatusBar barStyle="auto" />
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={LoginScreen} />

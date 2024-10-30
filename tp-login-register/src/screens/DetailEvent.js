@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal, Alert } from 'react-native';
 import { AuthContext } from '../../context/auth';
 import { getEventById } from '../../services/events';
-import { deleteEvent } from '../../services/events';
 import { getEventParticipants } from '../../services/events';
+import { enrollUser } from '../../services/events';
 
 
 export default function DetalleEvento({ route }) {
-  const { eventId } = route.params;
+  const { eventId, fromScreen } = route.params;
   const { token } = useContext(AuthContext);
   const [event, setEvent] = useState(null);
   const [participants, setParticipants] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -25,10 +27,10 @@ export default function DetalleEvento({ route }) {
 
     const fetchParticipants = async () => {
       try {
-        const participantsData = await getEventParticipants(eventId, token);
+        const participantsData = await getEventParticipants(eventId);
         setParticipants(participantsData);
       } catch (error) {
-        console.error('Error al obtener participantes:', error);
+        console.error('Error al obtener participantes: ', error);
       }
     };
     fetchEvent();
@@ -36,19 +38,31 @@ export default function DetalleEvento({ route }) {
   }, [eventId, token]);
 
 
-  const handleDelete = async () => {
-    try {
-      const response = await deleteEvent(eventId, token);
-      if (response.status === 200) {
-        setModalVisible(true); 
-      } else {
-        Alert.alert('Error', response.message || 'No se pudo eliminar el evento');
+  const enroll = async () => {
+    const response = await enrollUser(eventId, token);
+    console.log(response)
+    if(response.status == 200){
+        Alert.alert(
+          'Success',
+          `${user.username} inscripto correctamente`, 
+          [{ text: 'OK'}],
+          { cancelable: false }
+        );
       }
-    } catch (error) {
-      console.error('Error al eliminar el evento:', error);
-      Alert.alert('Error', 'No se pudo eliminar el evento');
-    }
-  };
+      else{
+        Alert.alert(
+          'Error',
+          `${user.username, response}`,
+          [{ text: 'OK'}],
+          { cancelable: false }
+        );
+      }
+}
+
+
+const navigateToEdit = () => {
+  navigation.navigate('EditEvent', {eventId});
+}
   
 
   return (
@@ -66,9 +80,19 @@ export default function DetalleEvento({ route }) {
         <Text style={styles.infoText}>Máxima asistencia: {event.max_assistance}</Text>
         <Text style={styles.price}>Precio: ${event.price}</Text>
       </View>
-      <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
-        <Text style={styles.deleteButtonText}>Eliminar Evento</Text>
-      </TouchableOpacity>
+      <View>
+      {fromScreen === 'Admin' ? (
+        new Date(event.start_date) < currentDate ? ( 
+        <TouchableOpacity onPress={navigateToEdit} style={styles.enrollButton}>
+            <Text style={styles.enrollButtonText}>Editar</Text> 
+        </TouchableOpacity>
+      ) : null 
+      ) : fromScreen === 'Home' ? (
+        <TouchableOpacity onPress={enroll} style={styles.enrollButton}>
+          <Text style={styles.enrollButtonText}>Inscribirse</Text> 
+        </TouchableOpacity>
+      ) : null}
+      </View>
 
       <View style={styles.participantsSection}>
         <Text style={styles.sectionTitle}>Participantes</Text>
@@ -91,7 +115,7 @@ export default function DetalleEvento({ route }) {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalText}>Evento eliminado correctamente</Text>
+            <Text style={styles.modalText}>Inscripto correctamente</Text>
             <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>Cerrar</Text>
             </TouchableOpacity>
@@ -202,5 +226,15 @@ const styles = StyleSheet.create({
     fontSize: 16, 
     color: '#777', 
     textAlign: 'center' 
-  }
+  },
+  enrollButton: {
+    backgroundColor: '#007BFF', 
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  enrollButtonText: {
+    color: 'white',
+    fontSize: 16,
+  },
 });
