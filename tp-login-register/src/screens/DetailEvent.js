@@ -8,7 +8,7 @@ import { enrollUser } from '../../services/events';
 
 
 export default function DetalleEvento({ route }) {
-  const { eventId, fromScreen } = route.params;
+  const { eventId, fromScreen } = route.params; // El evento que eligio el usuario y si es admin o no
   const { token } = useContext(AuthContext);
   const [event, setEvent] = useState(null);
   const [participants, setParticipants] = useState([]);
@@ -16,18 +16,18 @@ export default function DetalleEvento({ route }) {
   const navigation = useNavigation();
 
   useEffect(() => {
-    const fetchEvent = async () => {
+    const fetchEvent = async () => { // Traigo el evento que eligio el usuario
       try {
-        const eventDetails = await getEventById(eventId, token);
+        const eventDetails = await getEventById(eventId, token); // Llamo a la funcion getEventsById para traer el evento elegido por el usuario
         setEvent(eventDetails);
       } catch (error) {
         console.error(error);
       }
     };
 
-    const fetchParticipants = async () => {
+    const fetchParticipants = async () => { // Fetch de los participantes
       try {
-        const participantsData = await getEventParticipants(eventId);
+        const participantsData = await getEventParticipants(eventId); // LLamo a la funcion getEventParticipants del service del evento
         setParticipants(participantsData);
       } catch (error) {
         console.error('Error al obtener participantes: ', error);
@@ -38,10 +38,9 @@ export default function DetalleEvento({ route }) {
   }, [eventId, token]);
 
 
-  const enroll = async () => {
-    const response = await enrollUser(eventId, token);
-    console.log(response)
-    if(response.status == 200){
+  const enroll = async () => { // Funcion para enrolar al usuario al evento
+    const response = await enrollUser(eventId, token); // LLamo a la funcion enrollUser del service de eventos
+    if(response.status == 200){ // Si se pudo enrolar el usuario 
         Alert.alert(
           'Success',
           `${user.username} inscripto correctamente`, 
@@ -60,12 +59,13 @@ export default function DetalleEvento({ route }) {
 }
 
 
-const navigateToEdit = () => {
+const navigateToEdit = () => { // navegacion a editar evento con el id del evento elegido como parametro
   navigation.navigate('EditEvent', {eventId});
 }
   
 
-  return (
+  return ( 
+    // Toda la info del evento
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>{event.name}</Text>
       <Text style={styles.description}>{event.description}</Text>
@@ -81,13 +81,13 @@ const navigateToEdit = () => {
         <Text style={styles.price}>Precio: ${event.price}</Text>
       </View>
       <View>
-      {fromScreen === 'Admin' ? (
+      {fromScreen === 'Admin' ? ( // Si es dueño del evento le da la opcion de editarlo
         new Date(event.start_date) < currentDate ? ( 
         <TouchableOpacity onPress={navigateToEdit} style={styles.enrollButton}>
             <Text style={styles.enrollButtonText}>Editar</Text> 
         </TouchableOpacity>
       ) : null 
-      ) : fromScreen === 'Home' ? (
+      ) : fromScreen === 'Home' ? ( // Si no es dueño del evento le da la opcion de inscribirse
         <TouchableOpacity onPress={enroll} style={styles.enrollButton}>
           <Text style={styles.enrollButtonText}>Inscribirse</Text> 
         </TouchableOpacity>
@@ -96,7 +96,7 @@ const navigateToEdit = () => {
 
       <View style={styles.participantsSection}>
         <Text style={styles.sectionTitle}>Participantes</Text>
-        {participants.length > 0 ? (
+        {participants.length > 0 ? ( // Muestra los participantes del evento
           participants.map((participant, index) => (
             <View key={index} style={styles.participant}>
               <Text style={styles.participantText}>{participant.first_name} {participant.last_name}</Text>
@@ -107,7 +107,7 @@ const navigateToEdit = () => {
         )}
       </View>
 
-      <Modal
+      <Modal // Modal para confirmar la inscripcion
         transparent={true}
         visible={modalVisible}
         animationType="slide"

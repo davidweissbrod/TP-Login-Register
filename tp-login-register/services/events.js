@@ -2,9 +2,14 @@ import axios from 'axios';
 
 const API_URL = 'https://localhost:3000';
 
-export const getEvents = async (page = 1) => {
+// Explico poco xq es pura logica, lo importante esta comentado
+// GET = TRAE DEL BACK 
+// PUT = ACTUALIZA ALGO EXISTENTE
+// DELETE = BORRA
+// POST = SUBE ALGO NUEVO
+export const getEvents = async (page = 1) => { 
     try {
-        const response = await axios.get(`${API_URL}/event`, { params: { page: page } });
+        const response = await axios.get(`${API_URL}/event`, { params: { page: page } }); // Url de la API
         
         return response.data[0].events; 
 
@@ -28,7 +33,7 @@ export const getCategorias = async () => {
 export const getLocations = async (token) => {
     try{       
         const response = await axios.get(`${API_URL}/event-location`, {
-            headers: {
+            headers: { // Revisa que el token sea valido para traer las locations
                 Authorization: `Bearer ${token}`,
             },
         });
@@ -42,7 +47,7 @@ export const getLocations = async (token) => {
 
 export const createEvent = async (eventDetails, token) => {
     try {
-        const response = await axios.post(`${API_URL}/event`, {
+        const response = await axios.post(`${API_URL}/event`, { // Mete la data del evento que es traida de lo que mete el usuario por parametros
             name: eventDetails.name,
             description: eventDetails.description,
             id_event_category: eventDetails.id_event_category,
@@ -53,7 +58,7 @@ export const createEvent = async (eventDetails, token) => {
             enabled_for_enrollment: eventDetails.enabled_for_enrollment ? 1 : 0,
             max_assistance: eventDetails.max_assistance
         }, {
-            headers: {
+            headers: { // Se fija que el token sea valido
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json' 
             }
@@ -77,7 +82,7 @@ export const createEvent = async (eventDetails, token) => {
 export const getEventById = async (eventId, token) => {
     try {
       const response = await axios.get(`${API_URL}/event/${eventId}`, {
-        headers: {
+        headers: { // Revisa que el token sea valido
           Authorization: `Bearer ${token}`
         }
       });
@@ -90,8 +95,8 @@ export const getEventById = async (eventId, token) => {
 
 export const updateEvent = async (eventId, updatedEventData, token) => {
     try {
-      const response = await axios.put(`${API_URL}/event/${eventId}`, updatedEventData, {
-        headers: {
+      const response = await axios.put(`${API_URL}/event/${eventId}`, updatedEventData, { // Recibe el evento actualizado por parametros para haver el put (subirlo a la BD)
+        headers: { // Revisa que el token sea valido
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         }
@@ -141,7 +146,7 @@ export const getEventParticipants = async (eventId) => {
 
 export const enrollUser = async (id_event, token) => {
     try {       
-        const response = await axios.post(`${API_URL}/api/event/enrollment/${id_event}`,{}, {
+        const response = await axios.post(`${API_URL}/event/event_enrollments/${id_event}`,{}, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

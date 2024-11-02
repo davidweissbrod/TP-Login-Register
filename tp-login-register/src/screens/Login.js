@@ -8,18 +8,18 @@ import { Button } from 'react-native';
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigation = useNavigation(); 
-  const { signIn } = useContext(AuthContext);
+  const navigation = useNavigation(); // Defino la variable para usar la navegacion
+  const { signIn } = useContext(AuthContext); // Trae la funcion de loguearse del auth context
   
 
-  const handleRegisterNavigation = () => {
+  const handleRegisterNavigation = () => { //Navegacion al register
     navigation.navigate('Register');
   }
 
-  const handleLogin = async () => { 
+  const handleLogin = async () => { // Funcion que revisa que el login sea correcto
     if (email && password) {
-      const res = await signIn(email, password);
-      if(res.success){
+      const res = await signIn(email, password); // Uso de la funcion del auth context
+      if(res.success){ // Si es correcto se loguea
         Alert.alert(
           'Success',
           `${email} logeado correctamente`, 
@@ -28,7 +28,7 @@ export default function LoginScreen() {
         );
       }
       else{
-        Alert.alert(
+        Alert.alert( 
           'Error',
           `${res.message}`,
           [{ text: 'OK'}],
@@ -42,7 +42,7 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
-      <TextInput
+      <TextInput 
         style={styles.input}
         placeholder="example@email.com"
         value={email}
