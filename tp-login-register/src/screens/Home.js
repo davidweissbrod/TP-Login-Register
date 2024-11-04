@@ -6,13 +6,13 @@ import { getEvents } from '../../services/events';
 import { Button } from 'react-native';
 
 export default function HomeScreen() {
-    const { user, signOut } = useContext(AuthContext); // Trae una funcion para desloguearse del auth context
+    const { user, signOut } = useContext(AuthContext); 
     const [events, setEvents] = useState([]);
   
-    const fetchEvents = async () => { // Fetch de eventos
-      const fetchedEvents = await getEvents(); // Funcion importada desde el service que trae los eventos del back
+    const fetchEvents = async () => { 
+      const fetchedEvents = await getEvents(); 
       const fechaHoy = new Date();
-      const events = fetchedEvents.filter(event => new Date(event.start_date) > fechaHoy); // Filtra los eventos que no haya pasado la fecha
+      const events = fetchedEvents.filter(event => new Date(event.start_date) > fechaHoy);
       setEvents(events || []);
     };
 
@@ -34,14 +34,14 @@ export default function HomeScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollViewContent}
           >
-          {events && events.length > 0 ? ( // Recorro eventos para que sean mostrados
+          {events && events.length > 0 ? ( 
           events.map((event) => {
-            if (event.creator_user.username !== user.username) { // Si el nombre del creador del evento no coincide con el del user le muestra un evento al que se puede inscribir
+            if (event.creator_user.username !== user.username) { 
               return  <Card key={event.id} event={event} type={'Home'} />;; 
             }
-            return <Card key={event.id} event={event} type={'Admin'} />; // Si el nombre del creador del evento si coincide con el del user le muestra un evento para editar
+            return <Card key={event.id} event={event} type={'Admin'} />; 
           })
-          ) : ( // Texto si no hay eventos
+          ) : ( 
             <Text style={styles.text}>No hay eventos disponibles.</Text>
           )}
 

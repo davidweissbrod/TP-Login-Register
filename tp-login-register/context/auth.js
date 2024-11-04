@@ -14,12 +14,12 @@ export const Auth= ({ children }) => {
   })
 
   useEffect(() => {
-    const loadUser = async () => { // Traigo el usuario existente y token
+    const loadUser = async () => { 
       try {
         const userData = await AsyncStorage.getItem('user');
         const token = await AsyncStorage.getItem('token');
         if (userData) {
-          setUser(JSON.parse(userData)); // guardo los datos y el token del usuario
+          setUser(JSON.parse(userData)); 
           setToken(token);
         }
       } catch (error) {
@@ -30,13 +30,13 @@ export const Auth= ({ children }) => {
     loadUser();
   }, []);
 
-  const signIn = async (user, pass) => { // Funcion para hacer log in
-    let response = await loginUser(user, pass); // Llama a la funcion del service del user
+  const signIn = async (user, pass) => { 
+    let response = await loginUser(user, pass); 
     
     if(response.success){
-      let userResponse = await validateToken(response.token); // Valida el token del usuario
+      let userResponse = await validateToken(response.token); 
 
-      const authenticatedUser = { // LLeva al usuario con los datos obtenidos
+      const authenticatedUser = { 
         first_name: userResponse.first_name,
         last_name: userResponse.last_name,
         username: userResponse.username,
@@ -45,7 +45,7 @@ export const Auth= ({ children }) => {
 
       setToken(response.token);
       setUser(authenticatedUser);
-      await AsyncStorage.setItem('token', response.token); // guarda el token y el usuario
+      await AsyncStorage.setItem('token', response.token); 
       await AsyncStorage.setItem('user', JSON.stringify(authenticatedUser));
     }
     else{
@@ -54,20 +54,20 @@ export const Auth= ({ children }) => {
   };
 
   const register = async (user, pass, first, last) => {
-    const authenticatedUser = { // Llena al nuevo usuario con la data traida de los parametros
+    const authenticatedUser = { 
       username: user,
       password: pass,
       first_name: first,
       last_name: last
     }
 
-    let response = await registerUser(authenticatedUser); // Llama a la funcion para registrarse del service del user
+    let response = await registerUser(authenticatedUser); 
 
-    if(!response.success){ // Si falla tira error
+    if(!response.success){ 
       return response;
     }
     else{
-      setUser(authenticatedUser); // Si va guarda la data el user y el token
+      setUser(authenticatedUser); 
       setToken(response.token)
       await AsyncStorage.setItem('user', JSON.stringify(authenticatedUser));
       await AsyncStorage.setItem('token', response.token);
@@ -77,14 +77,14 @@ export const Auth= ({ children }) => {
     }
   };
 
-  const signOut = async () => { // Funcion para desloguearse
-    setUser({ // Borra los datos del usuario
+  const signOut = async () => { 
+    setUser({ 
         first_name: '',
         last_name: '',
         username: '',
         password: ''
     });
-    await AsyncStorage.removeItem('token'); // Borra el token y el usuario
+    await AsyncStorage.removeItem('token'); 
     await AsyncStorage.removeItem('user');
   };
   

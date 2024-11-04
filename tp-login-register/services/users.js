@@ -2,9 +2,9 @@ import axios from 'axios';
 
 const API_URL = 'https://localhost:3000';
 
-export const loginUser = async (username, password) => { // Loguea al usuario
+export const loginUser = async (username, password) => { 
     try {
-      const response = await axios.post(`${API_URL}/user/login`, { // Mete la data ingresada por el usuario y revisa que este bien
+      const response = await axios.post(`${API_URL}/user/login`, { 
         username: username,
         password: password
       });
@@ -16,9 +16,9 @@ export const loginUser = async (username, password) => { // Loguea al usuario
     }
   };
 
-  export const registerUser = async (userData) => { // Registra al usuario
+  export const registerUser = async (userData) => { 
     try {
-      const response = await axios.post(`${API_URL}/user/register`, { // Mete la data ingresada por el usuario 
+      const response = await axios.post(`${API_URL}/user/register`, { 
         first_name: userData.first_name,
         last_name: userData.last_name,
         username: userData.username,
@@ -26,7 +26,7 @@ export const loginUser = async (username, password) => { // Loguea al usuario
       });
   
       if (response.status === 201) { 
-        const login = await loginUser(userData.username, userData.password); // Si va loguea al usuario y lo ingresa, tambien le genera un token
+        const login = await loginUser(userData.username, userData.password); 
         const payload = await validateToken(login.token);
         return {
           payload: payload,
@@ -44,7 +44,7 @@ export const loginUser = async (username, password) => { // Loguea al usuario
     }
   };
 
-export const validateToken = async (token) => { // Valida un token 
+export const validateToken = async (token) => { 
     try 
     {
         const response = await axios.get(`${API_URL}/user/validartoken`, {

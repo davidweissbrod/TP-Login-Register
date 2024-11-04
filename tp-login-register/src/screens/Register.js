@@ -7,12 +7,12 @@ export default function RegisterScreen({ navigation }){
     const [last_name, onChangeLastName] = useState('')
     const [email, onChangeEmail] = useState('');
     const [pass, onChangeTextPass] = useState('');
-    const { register } = useContext(AuthContext); // Trae la funcion para registrarse del auth context
+    const { register } = useContext(AuthContext); 
 
-    const handleRegister = async () => { // Funcion que revisa que el registro sea correcto
+    const handleRegister = async () => { 
       if (email && pass && name && last_name) {
-        let res = await register(email, pass, name, last_name); // Llama a la funcion del auth context
-        if(res.success){ // Si esta bien registra el usuario
+        let res = await register(email, pass, name, last_name); 
+        if(res.success){ 
           Alert.alert(
             'Success',
             `${email} registrado`, 
@@ -30,7 +30,7 @@ export default function RegisterScreen({ navigation }){
         }
         }
     };
-    const navigateToLogin = () => { // Navegacion al login
+    const navigateToLogin = () => { 
       navigation.navigate('Login');
     };
 

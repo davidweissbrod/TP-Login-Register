@@ -5,7 +5,7 @@ import { AuthContext } from '../../context/auth';
 import { getCategorias, getLocations, createEvent } from '../../services/events';
 import { Button } from 'react-native';
 
-// Es practicamente igual al de editar 
+
 export default function NuevoEvento() {
   const { token } = useContext(AuthContext);
 

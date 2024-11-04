@@ -8,7 +8,7 @@ import { enrollUser } from '../../services/events';
 
 
 export default function DetalleEvento({ route }) {
-  const { eventId, fromScreen } = route.params; // El evento que eligio el usuario y si es admin o no
+  const { eventId, fromScreen } = route.params; 
   const { token } = useContext(AuthContext);
   const [event, setEvent] = useState(null);
   const [participants, setParticipants] = useState([]);
@@ -16,18 +16,18 @@ export default function DetalleEvento({ route }) {
   const navigation = useNavigation();
 
   useEffect(() => {
-    const fetchEvent = async () => { // Traigo el evento que eligio el usuario
+    const fetchEvent = async () => { 
       try {
-        const eventDetails = await getEventById(eventId, token); // Llamo a la funcion getEventsById para traer el evento elegido por el usuario
+        const eventDetails = await getEventById(eventId, token); 
         setEvent(eventDetails);
       } catch (error) {
         console.error(error);
       }
     };
 
-    const fetchParticipants = async () => { // Fetch de los participantes
+    const fetchParticipants = async () => { 
       try {
-        const participantsData = await getEventParticipants(eventId); // LLamo a la funcion getEventParticipants del service del evento
+        const participantsData = await getEventParticipants(eventId); 
         setParticipants(participantsData);
       } catch (error) {
         console.error('Error al obtener participantes: ', error);
@@ -38,9 +38,9 @@ export default function DetalleEvento({ route }) {
   }, [eventId, token]);
 
 
-  const enroll = async () => { // Funcion para enrolar al usuario al evento
-    const response = await enrollUser(eventId, token); // LLamo a la funcion enrollUser del service de eventos
-    if(response.status == 200){ // Si se pudo enrolar el usuario 
+  const enroll = async () => { 
+    const response = await enrollUser(eventId, token); 
+    if(response.status == 200){ 
         Alert.alert(
           'Success',
           `${user.username} inscripto correctamente`, 
@@ -59,7 +59,7 @@ export default function DetalleEvento({ route }) {
 }
 
 
-const navigateToEdit = () => { // navegacion a editar evento con el id del evento elegido como parametro
+const navigateToEdit = () => { 
   navigation.navigate('EditEvent', {eventId});
 }
   
@@ -81,13 +81,13 @@ const navigateToEdit = () => { // navegacion a editar evento con el id del event
         <Text style={styles.price}>Precio: ${event.price}</Text>
       </View>
       <View>
-      {fromScreen === 'Admin' ? ( // Si es dueño del evento le da la opcion de editarlo
+      {fromScreen === 'Admin' ? ( 
         new Date(event.start_date) < currentDate ? ( 
         <TouchableOpacity onPress={navigateToEdit} style={styles.enrollButton}>
             <Text style={styles.enrollButtonText}>Editar</Text> 
         </TouchableOpacity>
       ) : null 
-      ) : fromScreen === 'Home' ? ( // Si no es dueño del evento le da la opcion de inscribirse
+      ) : fromScreen === 'Home' ? ( 
         <TouchableOpacity onPress={enroll} style={styles.enrollButton}>
           <Text style={styles.enrollButtonText}>Inscribirse</Text> 
         </TouchableOpacity>
@@ -96,7 +96,7 @@ const navigateToEdit = () => { // navegacion a editar evento con el id del event
 
       <View style={styles.participantsSection}>
         <Text style={styles.sectionTitle}>Participantes</Text>
-        {participants.length > 0 ? ( // Muestra los participantes del evento
+        {participants.length > 0 ? ( 
           participants.map((participant, index) => (
             <View key={index} style={styles.participant}>
               <Text style={styles.participantText}>{participant.first_name} {participant.last_name}</Text>
@@ -107,7 +107,7 @@ const navigateToEdit = () => { // navegacion a editar evento con el id del event
         )}
       </View>
 
-      <Modal // Modal para confirmar la inscripcion
+      <Modal 
         transparent={true}
         visible={modalVisible}
         animationType="slide"

@@ -6,10 +6,10 @@ import { getCategorias, getLocations, getEventById, updateEvent } from '../../se
 import { Button } from 'react-native';
 
 export default function EditarEvento({ route }) {
-  const { token } = useContext(AuthContext); // Traigo un token de auth del auth context
+  const { token } = useContext(AuthContext); 
   const { eventId } = route.params; 
 
-  const [form, setForm] = useState({ // Seteo un form para completar con los datos a editar
+  const [form, setForm] = useState({ 
     name: '',
     description: '',
     id_event_category: '',
@@ -28,12 +28,12 @@ export default function EditarEvento({ route }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const categories = await getCategorias(); // Traigo las categorias del service de eventos
-        const locations = await getLocations(token); // Traigo las locations del service de eventos
-        const event = await getEventById(eventId, token); // Traigo el evento del service de eventos
+        const categories = await getCategorias(); 
+        const locations = await getLocations(token); 
+        const event = await getEventById(eventId, token); 
         setCategories(categories);
         setLocations(locations);
-        setForm({ // Seteo el form con la data actual
+        setForm({ 
           name: event.name,
           description: event.description,
           id_event_category: event.id_event_category,
@@ -55,7 +55,7 @@ export default function EditarEvento({ route }) {
     setForm({ ...form, [name]: value });
   };
 
-  const handleSubmit = () => { // Verifica que esten los espacios llenos antes de enviar el form
+  const handleSubmit = () => { 
     if (form.name && form.description && form.id_event_category && form.id_event_location && form.start_date && form.duration_in_minutes && form.price && form.enabled_for_enrollment && form.max_assistance) {
       setModalVisible(true);
     } else {
@@ -64,8 +64,8 @@ export default function EditarEvento({ route }) {
   };
 
   const confirmUpdateEvent = async () => {
-    const response = await updateEvent(eventId, form, token);  // Traigo la funcion para que se actualice la info
-    if (response.status === 200) { // Si la actualizacion fue correcta
+    const response = await updateEvent(eventId, form, token);  
+    if (response.status === 200) { 
       Alert.alert('El evento ha sido actualizado correctamente.', response.message);
     } else {
       Alert.alert('Error al actualizar el evento', response.message);
@@ -74,7 +74,7 @@ export default function EditarEvento({ route }) {
     setModalVisible(false);
   };
 
-  const cancelUpdate = () => { // Cancela el update del form
+  const cancelUpdate = () => { 
     setModalVisible(false);
   };
 
@@ -98,7 +98,7 @@ export default function EditarEvento({ route }) {
         style={styles.picker}
         onValueChange={(value) => handleChange('id_event_category', value)}
       >
-        {categories.map((category) => ( // Muestra las categorias disponibles
+        {categories.map((category) => ( 
           <Picker.Item key={category.id} label={category.name} value={category.id} />
         ))}
       </Picker>
@@ -107,7 +107,7 @@ export default function EditarEvento({ route }) {
         style={styles.picker}
         onValueChange={(value) => handleChange('id_event_location', value)}
       >
-        {locations.map((location) => ( // Muestra las locations disponibles
+        {locations.map((location) => ( 
           <Picker.Item key={location.id} label={location.name} value={location.id} />
         ))}
       </Picker>
@@ -148,7 +148,7 @@ export default function EditarEvento({ route }) {
 
       <Button variant='primary' onPress={handleSubmit} style={styles.buttonSubmit}></Button>
 
-      <Modal // Modal para confirmar la edicion del evento
+      <Modal 
         transparent={true}
         visible={modalVisible}
         animationType="slide"
