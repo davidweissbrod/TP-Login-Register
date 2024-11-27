@@ -1,126 +1,151 @@
-import React, { useState, useContext } from "react";
-import { StyleSheet, Text, View, TextInput, Alert } from "react-native";
-import { useNavigation } from '@react-navigation/native'; 
-import { AuthContext } from "../../context/auth";
-import { Button } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import {user_login} from '../../services/users';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-export default function LoginScreen() {
-  const [email, setEmail] = useState('');
+const Login = ({ navigation }) => {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const navigation = useNavigation(); 
-  const { signIn } = useContext(AuthContext); 
-  
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleRegisterNavigation = () => { 
-    navigation.navigate('Register');
-  }
-
-  const handleLogin = async () => { 
-    if (email && password) {
-      const res = await signIn(email, password); 
-      if(res.success){ 
-        Alert.alert(
-          'Success',
-          `${email} logeado correctamente`, 
-          [{ text: 'OK'}],
-          { cancelable: false }
-        );
+  const handleLogin = async () => {
+    try {
+      const result = await user_login(username, password);
+      if (result.status === 200) {
+        const token = result.data.token;
+        await AsyncStorage.setItem("storedToken", token);
+        navigation.navigate('Home', { token });
+      } else {
+        Alert.alert('Error', 'Usuario o contraseña incorrecta');
       }
-      else{
-        Alert.alert( 
-          'Error',
-          `${res.message}`,
-          [{ text: 'OK'}],
-          { cancelable: false }
-        );
-      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setErrorMessage('Error de login');
     }
-
+  };
+  const handleLoginAdmin = async () => {
+    try {
+      const result = await user_login(username, password);
+      if (result.status === 200) {
+        const token = result.data.token;
+        await AsyncStorage.setItem("storedToken", token);
+        navigation.navigate('Admin', { token });
+      } else {
+        Alert.alert('Error', 'Usuario o contraseña incorrecta');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setErrorMessage('Error de login');
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <TextInput 
+      <Text style={styles.title}>Iniciar Sesión</Text>
+      <TextInput
         style={styles.input}
-        placeholder="example@email.com"
-        value={email}
-        onChangeText={setEmail}
+        placeholder="Nombre de usuario"
+        value={username}
+        onChangeText={setUsername}
       />
       <TextInput
         style={styles.input}
-        placeholder="contraseña"
+        placeholder="Contraseña"
+        secureTextEntry
         value={password}
         onChangeText={setPassword}
-        secureTextEntry={true}
       />
+      <Button title="Iniciar Sesión" onPress={handleLogin} />
+      {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+      <View style={styles.registerContainer}>
+        <Text style={styles.registerText}>¿No tienes cuenta?</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+          <Text style={styles.registerLink}> Regístrate</Text>
+        </TouchableOpacity>
+      </View>
 
-      <Text style={styles.noCuenta} onPress={handleRegisterNavigation}>¿No tienes cuenta?</Text>
-      <Button title="Log in" onPress={handleLogin} style={styles.buttonLogin}/>
+      <View style={styles.adminContainer}>
+        <TouchableOpacity style={styles.adminButton} onPress={handleLoginAdmin}>
+          <Text style={styles.adminButtonText}>Iniciar como Admin</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: '#f9f9f9',  // Fondo claro y limpio
+    paddingTop: 40,
+    paddingHorizontal: 20,
+    justifyContent: 'center',  // Centra todo en la pantalla
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 20
+    marginBottom: 30,
+    textAlign: 'center',
   },
   input: {
-    width: '100%',
-    height: 50,
     backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginVertical: 10,
-    borderColor: '#ccc',
-    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginBottom: 15,
     fontSize: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    color: '#333',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    shadowColor: '#000',
     shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,  // Sombra suave en el input
   },
-  noCuenta: {
+  errorText: {
+    color: '#f44336',  // Rojo para errores
     fontSize: 14,
-    color: '#1E90FF',
-    marginVertical: 15,
-    textDecorationLine: 'underline',
+    textAlign: 'center',
+    marginBottom: 15,
   },
-  buttonLogin: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#1E90FF',
-    borderRadius: 8,
+  registerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  registerText: {
+    fontSize: 16,
+    color: '#555',
+  },
+  registerLink: {
+    fontSize: 16,
+    color: '#2196F3',  // Azul para el enlace
+    fontWeight: 'bold',
+  },
+  adminContainer: {
+    marginTop: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
-  buttonLoginText: {
+  adminButton: {
+    backgroundColor: '#FF9800',  // Naranja para el botón de Admin
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#FF9800',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,  // Botón con sombra
+  },
+  adminButtonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-  }
+  },
 });
+
+export default Login;

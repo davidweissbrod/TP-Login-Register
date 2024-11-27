@@ -1,155 +1,168 @@
-import axios from 'axios';
+import api from "./api";
 
-const API_URL = 'https://localhost:3000';
-
-
-export const getEvents = async (page = 1) => { 
-    try {
-        const response = await axios.get(`${API_URL}/event`, { params: { page: page } }); 
-        
-        return response.data[0].events; 
-
-    } catch (error) {
-        console.error(error);
-        return error.response ? error.response.data : null; 
-    }
+const getEvents = async () => {
+  const headers = {
+    "Content-Type": "application/json",
+    "ngrok-skip-browser-warning": true,  
+  };
+  const data = {}
+  try {
+    const result = await api('GET', headers, data, 'event');
+    return result;
+  } catch (error) {
+    console.error('Error en la solicitud:', error);
+    return { error: error.message };
+  }
 };
-
-export const getCategorias = async () => {
+const createEvents = async (data, token) => {
+    if (typeof token !== 'string') {
+      console.error('Token should be a string.');
+      return { error: 'Invalid token' };
+    }
+  
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "ngrok-skip-browser-warning": true,  
+    };
+  
     try {
-        const response = await axios.get(`${API_URL}/event-category`);
-        return response.data
+      const result = await api('POST', headers, data, 'event/createEvent');
+      return result;
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+      return { error: error.message };
     }
-    catch (error){
-        console.error(error);
-        return error.response ? error.response.data : null;
-    }
-}
+  };
 
-export const getLocations = async (token) => {
-    try{       
-        const response = await axios.get(`${API_URL}/event-location`, {
-            headers: { 
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response.data;
-    }
-    catch (error){
-        console.error(error);
-        return error.response ? error.response.data : null;
-    }
-}
-
-export const createEvent = async (eventDetails, token) => {
+  const enrollmentEvent = async (token,eventid,userid) =>
+  {
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "ngrok-skip-browser-warning": true,  
+    };
+  const data = {}
+  
     try {
-        const response = await axios.post(`${API_URL}/event`, { 
-            name: eventDetails.name,
-            description: eventDetails.description,
-            id_event_category: eventDetails.id_event_category,
-            id_event_location: eventDetails.id_event_location,
-            start_date: eventDetails.start_date,
-            duration_in_minutes: eventDetails.duration_in_minutes,
-            price: eventDetails.price,
-            enabled_for_enrollment: eventDetails.enabled_for_enrollment ? 1 : 0,
-            max_assistance: eventDetails.max_assistance
-        }, {
-            headers: { 
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json' 
-            }
-        });
-        return {
-            status: response.status,
-            message: response.data,
-        };
+      const result = await api('POST', headers, data, `event/${eventid}/${userid}/enrollment`);
+      console.log(result);
+      return result;
     } catch (error) {
-        console.error(error);
-        return error.response 
-            ? {
-                status: error.response.status,
-                message: error.response.data.message 
-              }
-            : { status: 500, message: 'Error de conexión.' };
+      console.error('Error en la solicitud:', error);
+      return { error: error.message };
     }
+  }
 
-}
-
-export const getEventById = async (eventId, token) => {
+  const getMaxCapacity = async (token, idLocation) =>
+  {
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "ngrok-skip-browser-warning": true,  
+    };
+  const data = {}
+  
     try {
-      const response = await axios.get(`${API_URL}/event/${eventId}`, {
-        headers: { 
-          Authorization: `Bearer ${token}`
-        }
-      });
-      return response.data;
+      const result = await api('POST', headers, data, `event/${idLocation}`);
+      console.log(result);
+      return result;
     } catch (error) {
-      console.error('Error obteniendo el evento:', error);
-      throw error;
+      console.error('Error en la solicitud:', error);
+      return { error: error.message };
     }
-}
-
-export const updateEvent = async (eventId, updatedEventData, token) => {
+  }
+  const getAllEvents = async () => {
+    const headers = {
+      "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": true,  
+    };
+    const data = {}
     try {
-      const response = await axios.put(`${API_URL}/event/${eventId}`, updatedEventData, { 
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }
-      });
-      return response.data;
+      console.log
+      const result = await api('GET', headers, data, 'event/getAll');
+      console.log(result);
+      return result;
     } catch (error) {
-      console.error('Error actualizando el evento:', error);
-      throw error;
+      console.error('Error en la solicitud:', error);
+      return { error: error.message };
     }
-}
+  };
+  
 
-export const deleteEvent = async (eventId, token) => {
+  const updateEvent = async (token,data) => {
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "ngrok-skip-browser-warning": true,  
+    };
+    console.log("data" + JSON.stringify(data));
     try {
-        const response = await axios.delete(`${API_URL}/event/${eventId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return {
-            status: response.status,
-            message: 'Evento eliminado con éxito',
-        };
+      console.log
+      const result = await api('PATCH', headers, data, 'event');
+      console.log(result);
+      return result;
     } catch (error) {
-        console.error('Error eliminando el evento:', error);
-        return error.response
-            ? {
-                status: error.response.status,
-                message: error.response.data.message || 'Error al eliminar el evento',
-            }
-            : { status: 500, message: 'Error de conexión.' };
+      console.error('Error en la solicitud:', error);
+      return { error: error.message };
     }
-}
+  };
 
-export const getEventParticipants = async (eventId) => {
+  const eventDetail = async (token,idEvento) => {
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "ngrok-skip-browser-warning": true,  
+    };
+    console.log("id Evento antes de enviar "+ idEvento);
+    const data= {};
     try {
-        const response = await axios.get(`${API_URL}/event/${eventId}/event_enrollments`, {
-            headers: { }
-        });
-
-        const participantsData = response.data
-        return participantsData;
+      console.log
+      const result = await api('GET', headers, data, `event/getDetail/${idEvento}`);
+      console.log(result);
+      return result;
     } catch (error) {
-        console.error('Error obteniendo participantes del evento:', error);
-        return error.response ? error.response.data : null;
+      console.error('Error en la solicitud:', error);
+      return { error: error.message };
     }
-};
+  };
 
-export const enrollUser = async (id_event, token) => {
-    try {       
-        const response = await axios.post(`${API_URL}/event/event_enrollments/${id_event}`,{}, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response;
+  const usersFromEvent = async (token,idEvent) => {
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "ngrok-skip-browser-warning": true,  
+    };
+    console.log("id Evento antes de enviar "+ idEvent);
+    const data = {};
+    try {
+      console.log
+      const result = await api('GET', headers, data, `event/${idEvent}/enrollment`);
+      console.log(result);
+      return result;
     } catch (error) {
-        console.error('Error en enrollUser:', error.message || error);
-        return error.response ? error.response.data : null;
+      console.error('Error en la solicitud:', error);
+      return { error: error.message };
     }
-}
+  };
+
+  const deleteEvent = async (token,idUser,idEvento) => {
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "ngrok-skip-browser-warning": true,  
+    };
+    console.log("id Evento antes de enviar "+ idEvento);
+    const data= {};
+    try {
+      console.log
+      const result = await api('DELETE', headers, data, `event/${idEvento}/${idUser}/del`);
+      console.log(result);
+      return result;
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+      return { error: error.message };
+    }
+  };
+
+  export default { getEvents,createEvents, enrollmentEvent, getMaxCapacity,getAllEvents, updateEvent,eventDetail,usersFromEvent,deleteEvent};

@@ -1,59 +1,64 @@
-import axios from 'axios';
-
-const API_URL = 'https://localhost:3000';
-
-export const loginUser = async (username, password) => { 
-    try {
-      const response = await axios.post(`${API_URL}/user/login`, { 
-        username: username,
-        password: password
-      });
-  
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return error.response.data;
-    }
+import api from "./api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+export const user_login = async (Username,Password) => {
+  const headers = {
+    "Content-Type": "application/json",
+    "ngrok-skip-browser-warning": true,  
   };
-
-  export const registerUser = async (userData) => { 
-    try {
-      const response = await axios.post(`${API_URL}/user/register`, { 
-        first_name: userData.first_name,
-        last_name: userData.last_name,
-        username: userData.username,
-        password: userData.password
-      });
-  
-      if (response.status === 201) { 
-        const login = await loginUser(userData.username, userData.password); 
-        const payload = await validateToken(login.token);
-        return {
-          payload: payload,
-          token: login.token
-        };
-      } else {
-        return false;
-      }
-    } catch (error) {
-      console.log('No se pudo registrar:', error.response ? error.response.data : error.message);
-      return {
-        success: false,
-        message: error.response.data
-      }
-    }
-  };
-
-export const validateToken = async (token) => { 
-    try 
-    {
-        const response = await axios.get(`${API_URL}/user/validartoken`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response.data.user;
-    } catch (error) {
-      console.log('No se pudo loguear:', error.message || error);
-    }
+  const data =
+  {
+    username: Username,
+    password: Password,
+  }
+  try {
+    const result = await api('POST', headers, data, 'user/login');
+    return result;
+  } catch (error) {
+    console.error('Error en la solicitud:', error);
+    return { error: error.message };
+  }
 };
+
+export const ObtenerInfoJugador = async (token) => {
+  const method = "POST";
+  const headers = {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`,
+    "ngrok-skip-browser-warning": true,  
+  };
+  const data = {};  
+  const path = "auth/Decode";  
+  
+  try {
+    const result = await api(method, headers, data, path);
+    console.log('User info response:', result.data);  
+    return result.data;
+  } catch (error) {
+    console.error('Error en ObtenerInfoJugador:', error.message);
+    await AsyncStorage.removeItem('@AccessToken');
+    return { error: error.message };
+  }
+};
+export const RegisterUser = async (firstName,lastName,Password,Username) =>
+{
+
+    const headers = {
+        "Content-Type": "application/json",
+    }
+
+    const data =
+  {
+    first_name: firstName,
+    last_name: lastName,
+    username: Username,
+    password: Password,
+  }
+  try {
+    const result = await api('POST', headers, data, 'user/register');
+    return result;
+  } catch (error) {
+    console.error('Error en la solicitud:', error);
+    return { error: error.message };
+  }
+}
+

@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TextInput, StyleSheet, Alert, ScrollView, Modal, Switch } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { AuthContext } from '../../context/auth';
-import { getCategorias, getLocations, createEvent } from '../../services/events';
 import { Button } from 'react-native';
 
 
