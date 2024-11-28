@@ -46,7 +46,6 @@ const createEvents = async (data, token) => {
   
     try {
       const result = await api('POST', headers, data, `event/${eventid}/${userid}/enrollment`);
-      console.log(result);
       return result;
     } catch (error) {
       console.error('Error en la solicitud:', error);
@@ -65,7 +64,6 @@ const createEvents = async (data, token) => {
   
     try {
       const result = await api('POST', headers, data, `event/${idLocation}`);
-      console.log(result);
       return result;
     } catch (error) {
       console.error('Error en la solicitud:', error);
@@ -79,9 +77,7 @@ const createEvents = async (data, token) => {
     };
     const data = {}
     try {
-      console.log
       const result = await api('GET', headers, data, 'event/getAll');
-      console.log(result);
       return result;
     } catch (error) {
       console.error('Error en la solicitud:', error);
@@ -96,14 +92,11 @@ const createEvents = async (data, token) => {
       "Authorization": `Bearer ${token}`,
       "ngrok-skip-browser-warning": true,  
     };
-    console.log("data" + JSON.stringify(data));
     try {
-      console.log
       const result = await api('PATCH', headers, data, 'event');
       console.log(result);
       return result;
     } catch (error) {
-      console.error('Error en la solicitud:', error);
       return { error: error.message };
     }
   };
@@ -114,12 +107,9 @@ const createEvents = async (data, token) => {
       "Authorization": `Bearer ${token}`,
       "ngrok-skip-browser-warning": true,  
     };
-    console.log("id Evento antes de enviar "+ idEvento);
     const data= {};
     try {
-      console.log
       const result = await api('GET', headers, data, `event/getDetail/${idEvento}`);
-      console.log(result);
       return result;
     } catch (error) {
       console.error('Error en la solicitud:', error);
@@ -127,18 +117,15 @@ const createEvents = async (data, token) => {
     }
   };
 
-  const usersFromEvent = async (token,idEvent) => {
+  const getParticipants = async (token,idEvent) => {
     const headers = {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`,
       "ngrok-skip-browser-warning": true,  
     };
-    console.log("id Evento antes de enviar "+ idEvent);
     const data = {};
     try {
-      console.log
       const result = await api('GET', headers, data, `event/${idEvent}/enrollment`);
-      console.log(result);
       return result;
     } catch (error) {
       console.error('Error en la solicitud:', error);
@@ -152,12 +139,9 @@ const createEvents = async (data, token) => {
       "Authorization": `Bearer ${token}`,
       "ngrok-skip-browser-warning": true,  
     };
-    console.log("id Evento antes de enviar "+ idEvento);
     const data= {};
     try {
-      console.log
       const result = await api('DELETE', headers, data, `event/${idEvento}/${idUser}/del`);
-      console.log(result);
       return result;
     } catch (error) {
       console.error('Error en la solicitud:', error);
@@ -165,4 +149,4 @@ const createEvents = async (data, token) => {
     }
   };
 
-  export default { getEvents,createEvents, enrollmentEvent, getMaxCapacity,getAllEvents, updateEvent,eventDetail,usersFromEvent,deleteEvent};
+  export default { getEvents,createEvents, enrollmentEvent, getMaxCapacity,getAllEvents, updateEvent,eventDetail,getParticipants,deleteEvent};

@@ -9,7 +9,7 @@ const getLocations = async (token) => {
   };
   const data = {}
   try {
-    const result = await api('Get', headers, data, 'event-location/getAll');
+    const result = await api('GET', headers, data, 'event-location/getAll');
     return result;
   } catch (error) {
     console.error('Error en la solicitud:', error);

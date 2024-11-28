@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Picker, Switch, Alert, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Switch, Alert, Modal, TouchableOpacity } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import category from '../../services/category';
 import location from '../../services/locations';
 import events from '../../services/events';
@@ -30,18 +31,20 @@ const NewEvent = ({ route, navigation }) => {
     const fetchCategories = async () => {
       try {
         const response = await category.getCategory();
-        setCategories(response.data);
+        setCategories(response.data || []);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
+        setCategories([]); // Evita errores de renderizado.
       }
     };
 
     const fetchLocations = async () => {
       try {
         const response = await location.getLocations(token);
-        setLocations(response.data);
+        setLocations(response.data || []);
       } catch (error) {
         console.error('Failed to fetch locations:', error);
+        setLocations([]); // Evita errores de renderizado.
       }
     };
 
@@ -101,9 +104,9 @@ const NewEvent = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-     <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Home", { token })}>
-  <Text style={styles.backButtonText}>Back</Text>
-</TouchableOpacity>
+     <TouchableOpacity style={styles.backButton}>
+      <Text style={styles.backButtonText}>Back</Text>
+    </TouchableOpacity>
 
       <Text style={styles.title}>Event Form</Text>
 
@@ -259,64 +262,46 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#f4f4f4',
   },
   backButton: {
-    marginBottom: 20,
-    padding: 10,
-    backgroundColor: '#007bff',
-    borderRadius: 8,
-    alignItems: 'center',
+    marginBottom: 15,
+    alignSelf: 'flex-start',
   },
   backButtonText: {
     fontSize: 16,
-    color: '#fff',
+    color: '#007bff',
     fontWeight: 'bold',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 20,
     textAlign: 'center',
+    marginBottom: 20,
   },
   input: {
-    height: 40,
-    borderColor: '#ddd',
+    height: 50,
+    borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 8,
-    paddingLeft: 10,
+    borderRadius: 10,
+    paddingHorizontal: 15,
     marginBottom: 15,
+    backgroundColor: '#fff',
     fontSize: 16,
-    color: '#333',
   },
   picker: {
-    height: 40,
-    borderColor: '#ddd',
+    height: 50,
+    borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 10,
+    backgroundColor: '#fff',
     marginBottom: 15,
   },
   error: {
-    color: '#dc3545',
+    color: '#d9534f',
     fontSize: 14,
     marginBottom: 10,
-  },
-  switch: {
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: '#007bff',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  buttonText: {
-    fontSize: 18,
-    color: '#fff',
-    fontWeight: 'bold',
   },
   modalContainer: {
     flex: 1,
@@ -325,35 +310,50 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
+    width: '90%',
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 15,
     padding: 20,
-    width: '80%',
-    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
   },
   modalTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 15,
+    textAlign: 'center',
   },
   modalButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     marginTop: 20,
   },
   modalButton: {
-    backgroundColor: '#28a745',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    flex: 1,
+    backgroundColor: '#007bff',
+    paddingVertical: 12,
+    marginHorizontal: 5,
     borderRadius: 8,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   modalButtonText: {
     fontSize: 16,
     color: '#fff',
     fontWeight: 'bold',
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  switchLabel: {
+    fontSize: 16,
+    color: '#333',
+    marginRight: 10,
   },
 });
 

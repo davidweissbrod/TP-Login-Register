@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal } from 'react-native';
-import eventsApi from '../../services/events';
+import events from '../../services/events';
 import { useNavigation } from '@react-navigation/native'; 
 import moment from 'moment';
 
@@ -31,7 +31,6 @@ const Admin = ({ route }) => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    console.log("Token recibido:", token);
 
     if (token) {
       const decodedUser = decodeTokenManual(token);
@@ -41,7 +40,7 @@ const Admin = ({ route }) => {
 
     const fetchEvents = async () => {
       try {
-        const response = await eventsApi.getEvents();
+        const response = await events.getEvents();
         const eventsArray = Array.isArray(response.data) ? response.data : [];
         const currentDate = moment();
 
@@ -68,12 +67,12 @@ const Admin = ({ route }) => {
   const openModal = async (type, eventId) => {
     try {
       if (type === 'detail') {
-        const response = await eventsApi.eventDetail(token, eventId);
+        const response = await events.eventDetail(token, eventId);
         setDetailsContent(response.data);
         setEventId(eventId);
         setDetailsModalVisible(true);
       } else if (type === 'participants') {
-        const response = await eventsApi.usersFromEvent(token, eventId);
+        const response = await events.getParticipants(token, eventId);
         const participantNames = response.data.map(participant => participant.first_name); 
         setParticipantsContent(participantNames);
         setParticipantsModalVisible(true);
@@ -87,7 +86,7 @@ const Admin = ({ route }) => {
   const deleteEvent = async(idEvent,idUser) =>
   {
     setDetailsModalVisible(false);
-    const response = await eventsApi.deleteEvent(token,idUser,idEvent);
+    const response = await events.deleteEvent(token,idUser,idEvent);
     
   }
 

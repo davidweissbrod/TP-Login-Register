@@ -31,7 +31,6 @@ export const ObtenerInfoJugador = async (token) => {
   
   try {
     const result = await api(method, headers, data, path);
-    console.log('User info response:', result.data);  
     return result.data;
   } catch (error) {
     console.error('Error en ObtenerInfoJugador:', error.message);

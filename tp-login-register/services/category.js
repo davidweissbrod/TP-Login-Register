@@ -1,4 +1,4 @@
-import api from "./api";
+import {api} from "./api";
 const getCategory = async () => {
   const headers = {
     "Content-Type": "application/json",
@@ -6,7 +6,7 @@ const getCategory = async () => {
   };
   const data = {}
   try {
-    const result = await api('Get', headers, data, 'event-category/getAll');
+    const result = await api('GET', headers, data, 'event-category/getAll');
     return result;
   } catch (error) {
     console.error('Error en la solicitud:', error);
