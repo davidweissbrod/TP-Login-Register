@@ -1,10 +1,11 @@
-import React from 'react';
-import Card from '../components/Card';
-import { SafeAreaView, Text, StyleSheet, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; 
+import moment from 'moment'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getEvents } from '../../services/events';
-import { Button } from 'react-native';
 
-const decodeToken = (token) => {
+/*const decodeToken = (token) => {
   try {
     const [header, payload, signature] = token.split('.');
     
@@ -21,9 +22,9 @@ const decodeToken = (token) => {
     return null;
   }
 };
-
+*/
 export default function HomeScreen({ route }) {
-  const { token } = route.params;
+  //const { token } = route.params;
   const [user, setUser] = useState({});
   const [events, setEvents] = useState([]);
   const navigation = useNavigation(); 
@@ -80,7 +81,7 @@ export default function HomeScreen({ route }) {
          style={styles.applyButton}
          onPress={() => navigation.navigate('Inscription', { token })} 
        >
-         <Text style={styles.applyButtonText}>Inscribirse al evento</Text>
+         <Text style={styles.applyButtonText}>Inscribirse</Text>
        </TouchableOpacity>
      </View>
    </View>

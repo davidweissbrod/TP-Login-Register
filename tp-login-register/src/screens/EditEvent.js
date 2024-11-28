@@ -1,293 +1,259 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert, ScrollView, Modal, Switch } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, Picker, Switch, Alert, Modal, TouchableOpacity, ScrollView } from 'react-native';
+import category from '../../services/category';
+import location from '../../services/locations';
+import events from '../../services/events';
 
-export default function EditarEvento({ route }) {
-  const { token } = useContext(AuthContext); 
-  const { eventId } = route.params; 
+const EditarEvento = ({ route, navigation }) => {
+  const { token, event } = route.params;
 
-  const [form, setForm] = useState({ 
-    name: '',
-    description: '',
-    id_event_category: '',
-    id_event_location: '',
-    start_date: '',
-    duration_in_minutes: '',
-    price: '',
-    enabled_for_enrollment: false,
-    max_assistance: ''
+  const [form, setForm] = useState({
+    id: event.id || '',
+    name: event.name || '',
+    description: event.description || '',
+    id_event_category: event.id_event_category || '',
+    id_event_location: event.id_event_location || '',
+    start_date: event.start_date || '',
+    duration_in_minutes: event.duration_in_minutes || '',
+    price: event.price || '',
+    enabled_for_enrollment: event.enabled_for_enrollment || false,
+    max_assistance: event.max_assistance || '',
+    id_creator_user: event.id_creator_user || '',
   });
 
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
+  const [errors, setErrors] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCategories = async () => {
       try {
-        const categories = await getCategorias(); 
-        const locations = await getLocations(token); 
-        const event = await getEventById(eventId, token); 
-        setCategories(categories);
-        setLocations(locations);
-        setForm({ 
-          name: event.name,
-          description: event.description,
-          id_event_category: event.id_event_category,
-          id_event_location: event.id_event_location,
-          start_date: event.start_date,
-          duration_in_minutes: event.duration_in_minutes.toString(),
-          price: event.price.toString(),
-          enabled_for_enrollment: event.enabled_for_enrollment,
-          max_assistance: event.max_assistance.toString()
-        });
+        const response = await category.getCategory();
+        setCategories(response.data);
       } catch (error) {
-        console.error(error);
+        console.error('Failed to fetch categories:', error);
       }
     };
-    fetchData();
-  }, [eventId]);
 
-  const handleChange = (name, value) => {
+    const fetchLocations = async () => {
+      try {
+        const response = await location.getLocations(token);
+        setLocations(response.data);
+      } catch (error) {
+        console.error('Failed to fetch locations:', error);
+      }
+    };
+
+    fetchCategories();
+    fetchLocations();
+  }, [token]);
+
+  const handleInputChange = (name, value) => {
     setForm({ ...form, [name]: value });
   };
 
-  const handleSubmit = () => { 
-    if (form.name && form.description && form.id_event_category && form.id_event_location && form.start_date && form.duration_in_minutes && form.price && form.enabled_for_enrollment && form.max_assistance) {
+  const validate = () => {
+    const newErrors = {};
+    if (!form.name) newErrors.name = 'Name is required';
+    if (!form.description) newErrors.description = 'Description is required';
+    if (!form.id_event_category) newErrors.id_event_category = 'Event category is required';
+    if (!form.id_event_location) newErrors.id_event_location = 'Event location is required';
+    if (!form.start_date) newErrors.start_date = 'Start date is required';
+    if (!form.duration_in_minutes || isNaN(form.duration_in_minutes) || form.duration_in_minutes <= 0)
+      newErrors.duration_in_minutes = 'Duration must be a positive number';
+    if (!form.price || isNaN(form.price) || form.price <= 0) newErrors.price = 'Price must be a positive number';
+    if (!form.max_assistance || isNaN(form.max_assistance) || form.max_assistance <= 0)
+      newErrors.max_assistance = 'Max assistance must be a positive number';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (validate()) {
       setModalVisible(true);
-    } else {
-      Alert.alert('Completar el formulario');
     }
   };
 
-  const confirmUpdateEvent = async () => {
-    const response = await updateEvent(eventId, form, token);  
-    if (response.status === 200) { 
-      Alert.alert('El evento ha sido actualizado correctamente.', response.message);
-    } else {
-      Alert.alert('Error al actualizar el evento', response.message);
+  const handleConfirm = async () => {
+    try {
+        console.log("token" + token);
+      const response = await events.updateEvent(token,form);
+      console.log('Event update response:', response);
+      setModalVisible(false);
+      setSuccessModalVisible(true);
+    } catch (error) {
+      console.error('Error updating event:', error);
+      Alert.alert('Error', 'There was an error updating the event.');
     }
+  };
 
+  const handleCancel = () => {
     setModalVisible(false);
   };
 
-  const cancelUpdate = () => { 
-    setModalVisible(false);
+  const handleSuccessClose = () => {
+    setSuccessModalVisible(false);
+    navigation.navigate('Home', { token });
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <Text style={styles.title}>Editar Evento</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Admin", { token })}>
+        <Text style={styles.backButtonText}>Volver</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.title}>Edit Event</Text>
+      
+  
+      <Text style={styles.label}>Name:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Nombre del evento"
         value={form.name}
-        onChangeText={(value) => handleChange('name', value)}
+        onChangeText={(text) => handleInputChange('name', text)}
       />
+      {errors.name && <Text style={styles.error}>{errors.name}</Text>}
+
+      <Text style={styles.label}>Description:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Descripción"
         value={form.description}
-        onChangeText={(value) => handleChange('description', value)}
+        onChangeText={(text) => handleInputChange('description', text)}
       />
+      {errors.description && <Text style={styles.error}>{errors.description}</Text>}
+
+   
+      <Text style={styles.label}>Event Category:</Text>
       <Picker
         selectedValue={form.id_event_category}
         style={styles.picker}
-        onValueChange={(value) => handleChange('id_event_category', value)}
+        onValueChange={(value) => handleInputChange('id_event_category', value)}
       >
-        {categories.map((category) => ( 
-          <Picker.Item key={category.id} label={category.name} value={category.id} />
+        <Picker.Item label="Select a category" value="" />
+        {categories.map((cat) => (
+          <Picker.Item key={cat.id} label={cat.name} value={cat.id} />
         ))}
       </Picker>
+      {errors.id_event_category && <Text style={styles.error}>{errors.id_event_category}</Text>}
+
+     
+      <Text style={styles.label}>Event Location:</Text>
       <Picker
         selectedValue={form.id_event_location}
         style={styles.picker}
-        onValueChange={(value) => handleChange('id_event_location', value)}
+        onValueChange={(value) => handleInputChange('id_event_location', value)}
       >
-        {locations.map((location) => ( 
-          <Picker.Item key={location.id} label={location.name} value={location.id} />
+        <Picker.Item label="Select a location" value="" />
+        {locations.map((loc) => (
+          <Picker.Item key={loc.id} label={loc.name} value={loc.id} />
         ))}
       </Picker>
+      {errors.id_event_location && <Text style={styles.error}>{errors.id_event_location}</Text>}
+
+ 
+      <Text style={styles.label}>Start Date:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Fecha de inicio"
         value={form.start_date}
-        onChangeText={(value) => handleChange('start_date', value)}
+        onChangeText={(text) => handleInputChange('start_date', text)}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Duración en minutos"
-        value={form.duration_in_minutes}
-        onChangeText={(value) => handleChange('duration_in_minutes', value)}
-        keyboardType="numeric"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Precio"
-        value={form.price}
-        onChangeText={(value) => handleChange('price', value)}
-        keyboardType="numeric"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Máxima asistencia"
-        value={form.max_assistance}
-        onChangeText={(value) => handleChange('max_assistance', value)}
-        keyboardType="numeric"
-      />
-      <View style={styles.switchContainer}>
-        <Text style={styles.header}>Habilitado para inscripción</Text>
-        <Switch
-          value={form.enabled_for_enrollment}
-          onValueChange={(value) => handleChange('enabled_for_enrollment', value)}
-        />
-      </View>
+      {errors.start_date && <Text style={styles.error}>{errors.start_date}</Text>}
 
-      <Button variant='primary' onPress={handleSubmit} style={styles.buttonSubmit}></Button>
+      <Text style={styles.label}>Duration (minutes):</Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        value={form.duration_in_minutes.toString()}
+        onChangeText={(text) => handleInputChange('duration_in_minutes', text)}
+      />
+      {errors.duration_in_minutes && <Text style={styles.error}>{errors.duration_in_minutes}</Text>}
 
-      <Modal 
-        transparent={true}
-        visible={modalVisible}
-        animationType="slide"
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Confirmar actualización</Text>
-            <Text>Nombre: {form.name}</Text>
-            <Text>Descripción: {form.description}</Text>
-            <Text>Categoría: {getCategoryName(form.id_event_category)}</Text>
-            <Text>Ubicación: {getLocationName(form.id_event_location)}</Text>
-            <Text>Fecha de inicio: {form.start_date}</Text>
-            <Text>Duración: {form.duration_in_minutes} minutos</Text>
-            <Text>Precio: ${form.price}</Text>
-            <Text>Inscripción habilitada: {form.enabled_for_enrollment ? 'Sí' : 'No'}</Text>
-            <Text>Máxima asistencia: {form.max_assistance}</Text>
-            <View style={styles.modalButtons}>
-              <Button variant='danger' onPress={cancelUpdate}>Cancelar</Button>
-              <Button variant='primary' onPress={confirmUpdateEvent}>Confirmar</Button>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <TouchableOpacity style={styles.submitButton} onPress={handleConfirm}>
+        <Text style={styles.submitButtonText}>Guardar</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-      padding: 20,
-      backgroundColor: '#f9f9f9', 
-      flexGrow: 1
-    },
-    title: {
-      fontSize: 28,
-      fontWeight: '600',
-      color: '#333',
-      textAlign: 'center',
-      marginBottom: 20
-    },
-    input: {
-      backgroundColor: '#fff',
-      borderWidth: 1,
-      borderColor: '#e0e0e0',
-      borderRadius: 12,
-      padding: 12,
-      fontSize: 16,
-      marginBottom: 15,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.1,
-      shadowRadius: 6,
-      elevation: 4
-    },
-    picker: {
-      backgroundColor: '#fff',
-      borderWidth: 1,
-      borderColor: '#e0e0e0',
-      borderRadius: 12,
-      marginBottom: 15,
-      padding: 10,
-      fontSize: 16,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 5
-    },
-    switchContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 20,
-      paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: '#ddd'
-    },
-    header: {
-      fontSize: 18,
-      fontWeight: '500',
-      color: '#555'
-    },
-    buttonSubmit: {
-      backgroundColor: '#007aff', 
-      padding: 12,
-      borderRadius: 12,
-      alignItems: 'center',
-      marginVertical: 20
-    },
-    buttonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '600'
-    },
-    modalContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)'
-    },
-    modalContent: {
-      width: '80%',
-      backgroundColor: '#fff',
-      borderRadius: 16,
-      padding: 20,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.3,
-      shadowRadius: 10
-    },
-    modalTitle: {
-      fontSize: 22,
-      fontWeight: 'bold',
-      marginBottom: 15,
-      textAlign: 'center',
-      color: '#333'
-    },
-    modalButtons: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginTop: 20
-    },
-    buttonDanger: {
-      backgroundColor: '#ff3b30', 
-      padding: 12,
-      borderRadius: 12,
-      alignItems: 'center',
-      flex: 1,
-      marginHorizontal: 5
-    },
-    buttonPrimary: {
-      backgroundColor: '#007aff',
-      padding: 12,
-      borderRadius: 12,
-      alignItems: 'center',
-      flex: 1,
-      marginHorizontal: 5
-    },
-    modalButtonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '600'
-    },
-  });
-  
+  container: {
+    flexGrow: 1,
+    padding: 20,
+    backgroundColor: '#f9f9f9',
+  },
+  backButton: {
+    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButtonText: {
+    fontSize: 18,
+    color: '#007bff',
+    fontWeight: 'bold',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 30,
+    textAlign: 'center',
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#555',
+    marginBottom: 8,
+  },
+  input: {
+    height: 45,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingLeft: 12,
+    backgroundColor: '#fff',
+    marginBottom: 15,
+    fontSize: 16,
+    color: '#333',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  picker: {
+    height: 45,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    marginBottom: 15,
+    fontSize: 16,
+    color: '#333',
+  },
+  error: {
+    color: '#f44336',
+    fontSize: 14,
+    marginBottom: 10,
+    marginTop: -10,
+  },
+  submitButton: {
+    backgroundColor: '#007bff',
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 3,
+  },
+  submitButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  scrollView: {
+    paddingBottom: 20,
+  },
+});
+
+export default EditarEvento;

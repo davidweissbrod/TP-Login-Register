@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert, ScrollView, Modal, Switch } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, Picker, Switch, Alert, Modal, TouchableOpacity } from 'react-native';
+import category from '../../services/category';
+import location from '../../services/locations';
+import events from '../../services/events';
 
 
-export default function NuevoEvento() {
-  const { token } = useContext(AuthContext);
-
+const NewEvent = ({ route, navigation }) => {
+  const { token } = route.params;
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -16,241 +16,345 @@ export default function NuevoEvento() {
     duration_in_minutes: '',
     price: '',
     enabled_for_enrollment: false,
-    max_assistance: ''
+    max_assistance: '',
+    id_creator_user: '',
   });
 
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
+  const [errors, setErrors] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false); 
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCategories = async () => {
       try {
-        const categories = await getCategorias();
-        const locations = await getLocations(token);
-        setCategories(categories);
-        setLocations(locations);
+        const response = await category.getCategory();
+        setCategories(response.data);
       } catch (error) {
-        console.error( error)
+        console.error('Failed to fetch categories:', error);
       }
     };
-    fetchData();
-  }, []);
 
-  const handleChange = (name, value) => {
+    const fetchLocations = async () => {
+      try {
+        const response = await location.getLocations(token);
+        setLocations(response.data);
+      } catch (error) {
+        console.error('Failed to fetch locations:', error);
+      }
+    };
+
+    fetchCategories();
+    fetchLocations();
+  }, [token]);
+
+  const handleInputChange = (name, value) => {
     setForm({ ...form, [name]: value });
   };
 
-  const handleSubmit = () => {
-    if(form.name && form.description && form.id_event_category && form.id_event_location && form.start_date && form.duration_in_minutes && form.price && form.enabled_for_enrollment && form.max_assistance){
+  const validate = () => {
+    const newErrors = {};
+    if (!form.name) newErrors.name = 'Name is required';
+    if (!form.description) newErrors.description = 'Description is required';
+    if (!form.id_event_category) newErrors.id_event_category = 'Event category is required';
+    if (!form.id_event_location) newErrors.id_event_location = 'Event location is required';
+    if (!form.start_date) newErrors.start_date = 'Start date is required';
+    if (!form.duration_in_minutes || isNaN(form.duration_in_minutes) || form.duration_in_minutes <= 0)
+      newErrors.duration_in_minutes = 'Duration must be a positive number';
+    if (!form.price || isNaN(form.price) || form.price <= 0) newErrors.price = 'Price must be a positive number';
+    if (!form.max_assistance || isNaN(form.max_assistance) || form.max_assistance <= 0)
+      newErrors.max_assistance = 'Max assistance must be a positive number';
+    if (!form.id_creator_user || isNaN(form.id_creator_user)) newErrors.id_creator_user = 'Creator user ID is required' ;
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (validate()) {
+
       setModalVisible(true);
     }
-    else{
-      Alert.alert('Completar el formulario')
-    }
-    
   };
 
-  const confirmEvent = async () => { 
-    const response = await createEvent(form, token);
-    if(response.status == 201){
-      Alert.alert('El evento ha sido agregado correctamente.', response.message);
+  const handleConfirm = async () => {
+    try {
+      console.log( typeof(form.id_creator_user))
+      const response = await events.createEvents(form, token);
+      console.log('Event creation response:', response);
+      setModalVisible(false);
+      setSuccessModalVisible(true); 
+    } catch (error) {
+      console.error('Error creating event:', error);
+      Alert.alert('Error', 'There was an error creating the event.');
     }
-    else{
-      Alert.alert('Error al crear el evento', response.message);
-    }
-    
-    setModalVisible(false); 
   };
 
-  const cancelEvent = () => {
+  const handleCancel = () => {
     setModalVisible(false);
   };
 
+  const handleSuccessClose = () => {
+    setSuccessModalVisible(false);
+  };
+
   return (
-   
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Nuevo Evento</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Nombre del evento"
-          value={form.name}
-          onChangeText={(value) => handleChange('name', value)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Descripción"
-          value={form.description}
-          onChangeText={(value) => handleChange('description', value)}
-        />
-        <Picker
-          selectedValue={form.id_event_category}
-          style={styles.picker}
-          onValueChange={(value) => handleChange('id_event_category', value)}
-        >
-          {categories.map((category) => (
-            <Picker.Item key={category.id} label={category.name} value={category.id} />
-          ))}
-        </Picker>
-        <Picker
-          selectedValue={form.id_event_location}
-          style={styles.picker}
-          onValueChange={(value) => handleChange('id_event_location', value)}
-        >
-          {locations.map((location) => (
-            <Picker.Item key={location.id} label={location.name} value={location.id} />
-          ))}
-        </Picker>
-        <TextInput
-          style={styles.input}
-          placeholder="Fecha de inicio"
-          value={form.start_date}
-          onChangeText={(value) => handleChange('start_date', value)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Duración en minutos"
-          value={form.duration_in_minutes}
-          onChangeText={(value) => handleChange('duration_in_minutes', value)}
-          keyboardType="numeric"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Precio"
-          value={form.price}
-          onChangeText={(value) => handleChange('price', value)}
-          keyboardType="numeric"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Máxima asistencia"
-          value={form.max_assistance}
-          onChangeText={(value) => handleChange('max_assistance', value)}
-          keyboardType="numeric"
-        />
-        <View style={styles.switchContainer}>
-          <Text style={styles.header}>Habilitado para inscripción</Text>
-          <Switch
-            value={form.enabled_for_enrollment}
-            onValueChange={(value) => handleChange('enabled_for_enrollment', value)}
-          />
-        </View>
+    <View style={styles.container}>
+     <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Home", { token })}>
+  <Text style={styles.backButtonText}>Back</Text>
+</TouchableOpacity>
 
-        <Button onPress={handleSubmit} style={styles.buttonSubmit}></Button>
+      <Text style={styles.title}>Event Form</Text>
 
-        <Modal
-          transparent={true}
-          visible={modalVisible}
-          animationType="slide"
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Confirmar evento</Text>
-              <Text>Nombre: {form.name}</Text>
-              <Text>Descripción: {form.description}</Text>
-              <Text>Categoría: {getCategoryName(form.id_event_category)}</Text>
-              <Text>Ubicación: {getLocationName(form.id_event_location)}</Text>
-              <Text>Fecha de inicio: {form.start_date}</Text>
-              <Text>Duración: {form.duration_in_minutes} minutos</Text>
-              <Text>Precio: ${form.price}</Text>
-              <Text>Inscripción habilitada: {form.enabled_for_enrollment ? 'Sí' : 'No'}</Text>
-              <Text>Máxima asistencia: {form.max_assistance}</Text>
-              <View style={styles.modalButtons}>
-                <Button onPress={cancelEvent} > Cancelar </Button>
-                <Button onPress={confirmEvent}>Confirmar</Button>
-              </View>
+      <Text>Name:</Text>
+      <TextInput
+        style={styles.input}
+        value={form.name}
+        onChangeText={(text) => handleInputChange('name', text)}
+      />
+      {errors.name && <Text style={styles.error}>{errors.name}</Text>}
+
+      <Text>Description:</Text>
+      <TextInput
+        style={styles.input}
+        value={form.description}
+        onChangeText={(text) => handleInputChange('description', text)}
+      />
+      {errors.description && <Text style={styles.error}>{errors.description}</Text>}
+
+      <Text>Event Category:</Text>
+      <Picker
+        selectedValue={form.id_event_category}
+        style={styles.picker}
+        onValueChange={(itemValue) => handleInputChange('id_event_category', itemValue)}
+      >
+        <Picker.Item label="Select a category" value="" />
+        {categories.map((category) => (
+          <Picker.Item key={category.id} label={category.name} value={ parseInt(category.id)} />
+        ))}
+      </Picker>
+      {errors.id_event_category && <Text style={styles.error}>{errors.id_event_category}</Text>}
+
+      <Text>Event Location:</Text>
+      <Picker
+        selectedValue={form.id_event_location}
+        style={styles.picker}
+        onValueChange={(itemValue) => handleInputChange('id_event_location', itemValue)}
+      >
+        <Picker.Item label="Select a location" value="" />
+        {locations.map((location) => (
+          <Picker.Item key={location.id} label={location.name} value={location.id} />
+        ))}
+      </Picker>
+      {errors.id_event_location && <Text style={styles.error}>{errors.id_event_location}</Text>}
+
+      <Text>Start Date:</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="YYYY-MM-DD"
+        value={form.start_date}
+        onChangeText={(text) => handleInputChange('start_date', text)}
+      />
+      {errors.start_date && <Text style={styles.error}>{errors.start_date}</Text>}
+
+      <Text>Duration (in minutes):</Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        value={form.duration_in_minutes}
+        onChangeText={(text) => handleInputChange('duration_in_minutes',  text ? parseInt(text, 10) : '')}
+      />
+      {errors.duration_in_minutes && <Text style={styles.error}>{errors.duration_in_minutes}</Text>}
+
+      <Text>Price:</Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        value={form.price}
+        onChangeText={(value) => handleInputChange('price',  value ? parseInt(value, 10) : '')}
+      />
+      {errors.price && <Text style={styles.error}>{errors.price}</Text>}
+
+      <Text>Enabled for Enrollment:</Text>
+      <Switch
+        value={form.enabled_for_enrollment}
+        onValueChange={(value) => handleInputChange('enabled_for_enrollment', value)}
+      />
+
+      <Text>Max Assistance:</Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        value={form.max_assistance}
+        onChangeText={(value) => handleInputChange('max_assistance',  value ? parseInt(value, 10) : '' )}
+      />
+      {errors.max_assistance && <Text style={styles.error}>{errors.max_assistance}</Text>}
+
+      <Text>Creator User ID:</Text>
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        value={form.id_creator_user}
+        onChangeText={(value) => handleInputChange('id_creator_user', value ? parseInt(value, 10) : '')}
+      />
+      {errors.id_creator_user && <Text style={styles.error}>{errors.id_creator_user}</Text>}
+
+      <Button title="Submit" onPress={handleSubmit} />
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Confirm Event Creation</Text>
+            <Text>Name: {form.name}</Text>
+            <Text>Description: {form.description}</Text>
+            <Text>Category: {categories.find(cat => cat.id === form.id_event_category)?.name}</Text>
+            <Text>Location: {locations.find(loc => loc.id === form.id_event_location)?.name}</Text>
+            <Text>Start Date: {form.start_date}</Text>
+            <Text>Duration: {form.duration_in_minutes} minutes</Text>
+            <Text>Price: ${form.price}</Text>
+            <Text>Enabled for Enrollment: {form.enabled_for_enrollment ? 'Yes' : 'No'}</Text>
+            <Text>Max Assistance: {form.max_assistance}</Text>
+            <Text>Creator User ID: {form.id_creator_user}</Text>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={styles.modalButton} onPress={handleConfirm}>
+                <Text style={styles.modalButtonText}>Confirm</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalButton} onPress={handleCancel}>
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        </Modal>
-      </ScrollView> 
+        </View>
+      </Modal>
+      <Modal
+        visible={successModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={handleSuccessClose}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Evento creado exitosamente</Text>
+            <Text>Tu evento fue creado exitosamente.</Text>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={styles.modalButton} onPress={handleSuccessClose}>
+                <Text style={styles.modalButtonText}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-      flexGrow: 1,
-      padding: 20,
-      backgroundColor: '#f5f5f5'
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: '#333',
-      marginBottom: 20,
-      textAlign: 'center'
-    },
-    input: {
-      backgroundColor: '#fff',
-      borderRadius: 8,
-      padding: 15,
-      fontSize: 16,
-      color: '#333',
-      marginBottom: 15,
-      borderWidth: 1,
-      borderColor: '#ccc'
-    },
-    picker: {
-      backgroundColor: '#fff',
-      borderRadius: 8,
-      marginBottom: 15,
-      borderWidth: 1,
-      borderColor: '#ccc'
-    },
-    switchContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 15
-    },
-    header: {
-      fontSize: 16,
-      color: '#333'
-    },
-    buttonSubmit: {
-      backgroundColor: '#1E90FF',
-      borderRadius: 8,
-      paddingVertical: 15,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginTop: 20,
-      shadowColor: "#000",
-      shadowOffset: {
-        width: 0,
-        height: 2
-      },
-      shadowOpacity: 0.1,
-      shadowRadius: 3.84,
-      elevation: 5
-    },
-    modalContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)'
-    },
-    modalContent: {
-      width: '90%',
-      backgroundColor: '#fff',
-      borderRadius: 10,
-      padding: 20,
-      alignItems: 'center'
-    },
-    modalTitle: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      color: '#333',
-      marginBottom: 15
-    },
-    modalButtons: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      width: '100%',
-      marginTop: 20
-    },
-    buttonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: 'bold'
-    },
-  });
-  
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#f9f9f9',
+  },
+  backButton: {
+    marginBottom: 20,
+    padding: 10,
+    backgroundColor: '#007bff',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    height: 40,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingLeft: 10,
+    marginBottom: 15,
+    fontSize: 16,
+    color: '#333',
+  },
+  picker: {
+    height: 40,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 15,
+  },
+  error: {
+    color: '#dc3545',
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  switch: {
+    marginBottom: 20,
+  },
+  button: {
+    backgroundColor: '#007bff',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 20,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 15,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 20,
+  },
+  modalButton: {
+    backgroundColor: '#28a745',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalButtonText: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+});
+
+export default NewEvent;

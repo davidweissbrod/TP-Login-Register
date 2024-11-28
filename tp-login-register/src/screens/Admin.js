@@ -18,7 +18,7 @@ const decodeTokenManual = (token) => {
   }
 };
 
-const adminPage = ({ route }) => {
+const Admin = ({ route }) => {
   const { token } = route.params;
   const [user, setUser] = useState({});
   const [currentEvents, setCurrentEvents] = useState([]);
@@ -111,7 +111,7 @@ const adminPage = ({ route }) => {
       {isEditable && (
         <TouchableOpacity 
           style={styles.editButton} 
-          onPress={() => navigation.navigate('editarEvento', { event, token })}>
+          onPress={() => navigation.navigate('EditEvent', { event, token })}>
           <Text style={styles.editButtonText}>Editar</Text>
         </TouchableOpacity>
       )}
@@ -199,72 +199,72 @@ const adminPage = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
+    backgroundColor: '#f9f9f9',
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginTop: 20,
-    marginBottom: 10,
-    textAlign: 'left',
+    color: '#333',
+    marginBottom: 15,
+    textAlign: 'center',
   },
   eventItem: {
-    padding: 10,
-    marginVertical: 8,
     backgroundColor: '#fff',
-    borderRadius: 5,
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 3,
+    shadowRadius: 5,
+    elevation: 3,
   },
   eventTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
   },
   eventDate: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 16,
+    color: '#777',
+    marginBottom: 15,
   },
-  editButton: {
-    marginTop: 10,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    backgroundColor: '#007BFF',
-    borderRadius: 5,
-    alignSelf: 'flex-start',
-  },
-  editButtonText: {
+  buttonText: {
+    fontSize: 16,
     color: '#fff',
-    fontSize: 14,
     fontWeight: 'bold',
   },
   detailButton: {
-    marginTop: 10,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    backgroundColor: '#28a745',
-    borderRadius: 5,
-    alignSelf: 'flex-start',
+    backgroundColor: '#007bff',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
   },
   participantsButton: {
-    marginTop: 10,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    backgroundColor: '#ffc107',
-    borderRadius: 5,
-    alignSelf: 'flex-start',
+    backgroundColor: '#28a745',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 14,
+  editButton: {
+    backgroundColor: '#ffc107',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  editButtonText: {
+    fontSize: 16,
+    color: '#333',
     fontWeight: 'bold',
   },
   modalBackground: {
@@ -275,25 +275,40 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: '#fff',
+    borderRadius: 8,
     padding: 20,
-    borderRadius: 10,
     width: '80%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
+    color: '#333',
     marginBottom: 10,
   },
   modalBody: {
-    fontSize: 14,
+    fontSize: 16,
+    color: '#555',
     marginBottom: 20,
+    textAlign: 'center',
+    maxHeight: 200,
+    overflowY: 'scroll',
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 10,
   },
   closeButton: {
-    paddingVertical: 10,
     backgroundColor: '#dc3545',
-    borderRadius: 5,
-    alignSelf: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
   },
 });
 
-export default adminPage;
+export default Admin;
