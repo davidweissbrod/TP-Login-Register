@@ -41,7 +41,7 @@ export default function HomeScreen({ route }) {
           const events = Array.isArray(response.data) ? response.data : [];
           const currentDate = moment();
           const filteredEvents = events.filter(event => {
-              const eventDate = moment(event.start_date);
+            const eventDate = moment(event.start_date);
               return eventDate.isAfter(currentDate, 'day') || eventDate.isSame(currentDate, 'day'); 
           });
           await AsyncStorage.setItem('filteredEvents', JSON.stringify(filteredEvents));

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import event from '../../services/events';
+import {getMaxCapacity, enrollmentEvent, getEvents} from '../../services/events';
 import { View, Text, StyleSheet,FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';  // Importamos el hook
 
@@ -32,7 +32,7 @@ const Inscription = ( {route}) =>
 
     const getFilteredEvents = async () => {
       try {
-        const async = await AsyncStorage.getItem('filteredEvents');
+        const async = await getEvents();
         
         if (async) {
           const events = JSON.parse(async);
@@ -41,7 +41,7 @@ const Inscription = ( {route}) =>
           if (Array.isArray(events)) {
             const validatedEvents = await Promise.all(events.map(async (event) => {
               try {
-                const isValid = await event.getMaxCapacity(parseInt(event.id_event_location));
+                const isValid = await getMaxCapacity(parseInt(event.id_event_location));
                 return isValid ? event : null;
               } catch (error) {
                 console.error(`Error validando evento ${event.name}:`, error);
@@ -73,7 +73,7 @@ const Inscription = ( {route}) =>
       const user = decodeTokenManual(token);
         try
         {
-          const response = await event.enrollmentEvent(storedToken,idEvent,user.id);
+          const response = await enrollmentEvent(storedToken,idEvent,user.id);
         }
         catch(e)
         { console.log(e)}
