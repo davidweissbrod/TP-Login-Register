@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal } from 'react-native';
-import events from '../../services/events';
+import {getEvents, eventDetail, getParticipants, deleteEvent} from '../../services/events';
 import { useNavigation } from '@react-navigation/native'; 
 import moment from 'moment';
 
@@ -40,7 +40,7 @@ const Admin = ({ route }) => {
 
     const fetchEvents = async () => {
       try {
-        const response = await events.getEvents();
+        const response = await getEvents();
         const eventsArray = Array.isArray(response.data) ? response.data : [];
         const currentDate = moment();
 
@@ -67,12 +67,12 @@ const Admin = ({ route }) => {
   const openModal = async (type, eventId) => {
     try {
       if (type === 'detail') {
-        const response = await events.eventDetail(token, eventId);
+        const response = await eventDetail(token, eventId);
         setDetailsContent(response.data);
         setEventId(eventId);
         setDetailsModalVisible(true);
       } else if (type === 'participants') {
-        const response = await events.getParticipants(token, eventId);
+        const response = await getParticipants(token, eventId);
         const participantNames = response.data.map(participant => participant.first_name); 
         setParticipantsContent(participantNames);
         setParticipantsModalVisible(true);
@@ -83,10 +83,10 @@ const Admin = ({ route }) => {
   };
 
 
-  const deleteEvent = async(idEvent,idUser) =>
+  const deleteEvents = async(idEvent,idUser) =>
   {
     setDetailsModalVisible(false);
-    const response = await events.deleteEvent(token,idUser,idEvent);
+    const response = await deleteEvent(token,idUser,idEvent);
     
   }
 

@@ -1,6 +1,7 @@
 import api from "./api";
 
 const getEvents = async (token) => {
+  console.log('entro')
   const headers = {
     "Content-Type": "application/json",
     "Authorization": `Bearer ${token}`,
@@ -9,6 +10,7 @@ const getEvents = async (token) => {
   const data = {}
   try {
     const result = await api('GET', headers, data, 'event');
+    console.log(result)
     return result;
   } catch (error) {
     console.error('Error en la solicitud:', error);
@@ -150,4 +152,4 @@ const createEvents = async (data, token) => {
     }
   };
 
-  export default { getEvents,createEvents, enrollmentEvent, getMaxCapacity,getAllEvents, updateEvent,eventDetail,getParticipants,deleteEvent};
+  export { getEvents,createEvents, enrollmentEvent, getMaxCapacity,getAllEvents, updateEvent,eventDetail,getParticipants,deleteEvent};

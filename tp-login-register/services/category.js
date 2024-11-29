@@ -1,4 +1,5 @@
-import {api} from "./api";
+import api from "./api";
+
 const getCategory = async () => {
   const headers = {
     "Content-Type": "application/json",

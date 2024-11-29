@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Switch, Alert, Modal, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import category from '../../services/category';
-import location from '../../services/locations';
+import {getCategory} from '../../services/category';
+import {getLocations} from '../../services/locations';
 import events from '../../services/events';
 
 
@@ -30,7 +30,7 @@ const NewEvent = ({ route, navigation }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await category.getCategory();
+        const response = await getCategory();
         setCategories(response.data || []);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
@@ -40,7 +40,7 @@ const NewEvent = ({ route, navigation }) => {
 
     const fetchLocations = async () => {
       try {
-        const response = await location.getLocations(token);
+        const response = await getLocations(token);
         setLocations(response.data || []);
       } catch (error) {
         console.error('Failed to fetch locations:', error);

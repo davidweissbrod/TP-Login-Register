@@ -38,6 +38,7 @@ export default function HomeScreen({ route }) {
     const fetchEvents = async () => {
       try {
           const response = await getEvents(token);  
+          console.log(response)
           const events = response.data
           const currentDate = moment();
           const filteredEvents = events.filter(event => {
