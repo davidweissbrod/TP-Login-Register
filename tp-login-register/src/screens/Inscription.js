@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getMaxCapacity, enrollmentEvent, getEvents} from '../../services/events';
+import {getMaxCapacity, enrollmentEvent} from '../../services/events';
 import { View, Text, StyleSheet,FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';  // Importamos el hook
 
@@ -27,12 +27,9 @@ const Inscription = ( {route}) =>
       }
     };
 
-   
-      
-
     const getFilteredEvents = async () => {
       try {
-        const async = await getEvents();
+        const async = await AsyncStorage.getItem('filteredEvents');
         
         if (async) {
           const events = JSON.parse(async);

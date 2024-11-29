@@ -1,8 +1,9 @@
 import api from "./api";
 
-const getEvents = async () => {
+const getEvents = async (token) => {
   const headers = {
     "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`,
     "ngrok-skip-browser-warning": true,  
   };
   const data = {}
