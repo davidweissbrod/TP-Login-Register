@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Switch, Alert, Modal, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import {getCategory} from '../../services/category';
-import {getLocations} from '../../services/locations';
-import events from '../../services/events';
+import categoryService from '../../services/category';
+import locationsService from '../../services/locations';
+import {createEvents} from '../../services/events';
 
 
 const NewEvent = ({ route, navigation }) => {
@@ -30,7 +30,7 @@ const NewEvent = ({ route, navigation }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await getCategory();
+        const response = await categoryService.getCategory();
         setCategories(response.data || []);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
@@ -40,7 +40,7 @@ const NewEvent = ({ route, navigation }) => {
 
     const fetchLocations = async () => {
       try {
-        const response = await getLocations(token);
+        const response = await locationsService.getLocations(token);
         setLocations(response.data || []);
       } catch (error) {
         console.error('Failed to fetch locations:', error);
@@ -84,7 +84,7 @@ const NewEvent = ({ route, navigation }) => {
   const handleConfirm = async () => {
     try {
       console.log( typeof(form.id_creator_user))
-      const response = await events.createEvents(form, token);
+      const response = await createEvents(form, token);
       console.log('Event creation response:', response);
       setModalVisible(false);
       setSuccessModalVisible(true); 

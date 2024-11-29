@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Picker, Switch, Alert, Modal, TouchableOpacity, ScrollView } from 'react-native';
-import {getCategory} from '../../services/category';
-import {getLocations} from '../../services/locations';
-import events from '../../services/events';
+import catService from '../../services/category';
+import locService from '../../services/locations';
+import {updateEvent} from '../../services/events';
 
 const EditarEvento = ({ route, navigation }) => {
  const { token, event } = route.params;
@@ -30,7 +30,7 @@ const EditarEvento = ({ route, navigation }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await getCategory();
+        const response = await catService.getCategory();
         setCategories(response.data || []);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
@@ -40,7 +40,7 @@ const EditarEvento = ({ route, navigation }) => {
     
     const fetchLocations = async () => {
       try {
-        const response = await getLocations(token);
+        const response = await locService.getLocations(token);
         setLocations(response.data || []);
       } catch (error) {
         console.error('Failed to fetch locations:', error);
@@ -81,7 +81,7 @@ const EditarEvento = ({ route, navigation }) => {
 
   const handleConfirm = async () => {
     try {
-      const response = await events.updateEvent(token,form);
+      const response = await updateEvent(token,form);
       console.log('Event update response:', response);
       setModalVisible(false);
       setSuccessModalVisible(true);
