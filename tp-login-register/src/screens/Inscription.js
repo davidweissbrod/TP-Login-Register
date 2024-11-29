@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import event from '../../services/events';
 import { View, Text, StyleSheet,FlatList, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';  // Importamos el hook
 
 const Inscription = ( {route}) =>
 {
   const { token } = route.params;
     const [filteredEvents, setFilteredEvents] = useState([]);
+    const navigation = useNavigation();
 
     const decodeTokenManual = (token) => {
       try {
@@ -79,9 +81,16 @@ const Inscription = ( {route}) =>
 
     return (
       <View style={styles.container}>
+        <TouchableOpacity 
+        style={styles.backButton} 
+        onPress={() => navigation.goBack()}  // Navegar hacia atrás
+      >
+        <Text style={styles.backButtonText}>Volver</Text>
+        </TouchableOpacity>
         {filteredEvents.length === 0 ? (
           <Text style={styles.emptyText}>No hay eventos disponibles.</Text>
         ) : (
+          
           <FlatList
             data={filteredEvents}
             keyExtractor={(item) => item.id.toString()}

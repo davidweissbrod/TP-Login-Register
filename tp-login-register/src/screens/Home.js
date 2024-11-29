@@ -5,7 +5,7 @@ import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getEvents } from '../../services/events';
 
-/*const decodeToken = (token) => {
+const decodeToken = (token) => {
   try {
     const [header, payload, signature] = token.split('.');
     
@@ -22,9 +22,9 @@ import { getEvents } from '../../services/events';
     return null;
   }
 };
-*/
+
 export default function HomeScreen({ route }) {
-  //const { token } = route.params;
+  const { token } = route.params;
   const [user, setUser] = useState({});
   const [events, setEvents] = useState([]);
   const navigation = useNavigation(); 

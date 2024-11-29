@@ -5,7 +5,7 @@ import location from '../../services/locations';
 import events from '../../services/events';
 
 const EditarEvento = ({ route, navigation }) => {
- // const { token, event } = route.params;
+ const { token, event } = route.params;
 
   const [form, setForm] = useState({
     id: event.id || '',
@@ -40,7 +40,7 @@ const EditarEvento = ({ route, navigation }) => {
     
     const fetchLocations = async () => {
       try {
-        const response = await location.getLocations(/*token*/);
+        const response = await location.getLocations(token);
         setLocations(response.data || []);
       } catch (error) {
         console.error('Failed to fetch locations:', error);
@@ -50,7 +50,7 @@ const EditarEvento = ({ route, navigation }) => {
 
     fetchCategories();
     fetchLocations();
-  }, [/*token*/]);
+  }, [token]);
 
   const handleInputChange = (name, value) => {
     setForm({ ...form, [name]: value });
@@ -81,7 +81,7 @@ const EditarEvento = ({ route, navigation }) => {
 
   const handleConfirm = async () => {
     try {
-      //const response = await events.updateEvent(token,form);
+      const response = await events.updateEvent(token,form);
       console.log('Event update response:', response);
       setModalVisible(false);
       setSuccessModalVisible(true);
@@ -97,12 +97,12 @@ const EditarEvento = ({ route, navigation }) => {
 
   const handleSuccessClose = () => {
     setSuccessModalVisible(false);
-    //navigation.navigate('Home', { token });
+    navigation.navigate('Home', { token });
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate(/*"Admin", { token }*/)}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Admin", { token })}>
         <Text style={styles.backButtonText}>Volver</Text>
       </TouchableOpacity>
 

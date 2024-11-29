@@ -104,8 +104,11 @@ const NewEvent = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-     <TouchableOpacity style={styles.backButton}>
-      <Text style={styles.backButtonText}>Back</Text>
+    <TouchableOpacity
+      style={styles.backButton}
+      onPress={() => navigation.goBack()} 
+    >
+      <Text style={styles.backButtonText}>Volver</Text>
     </TouchableOpacity>
 
       <Text style={styles.title}>Event Form</Text>
