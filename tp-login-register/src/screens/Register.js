@@ -9,16 +9,15 @@ const Register = ({ navigation }) => {
   const [password, setPassword] = useState('');
 
   const handleRegister = async () => {
-    if (!firstName || !lastName || !username || !password || !confirmPassword) {
+    if (!firstName || !lastName || !username || !password) {
       Alert.alert('Por favor, complete el formulario.');
       return;
     }
     try
     {
         const result = await RegisterUser(firstName,lastName,password,username) 
-        if (result.status === true) {
-            navigation.navigate('Home');
-        }
+        navigation.navigate('Home', { token: result.data.token });
+        
     }  
     catch(error)
     {
