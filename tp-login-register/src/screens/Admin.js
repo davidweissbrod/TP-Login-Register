@@ -119,8 +119,9 @@ const Admin = ({ route }) => {
 
   return (
     <View style={styles.container}>
-
-
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backButtonText}>Volver</Text>
+      </TouchableOpacity>
       <Text style={styles.sectionTitle}>Eventos Vigentes</Text>
       <FlatList
         data={currentEvents}
@@ -154,7 +155,7 @@ const Admin = ({ route }) => {
       <TouchableOpacity 
         onPress={() => {
           if (eventId && user.id) {
-            deleteEvent(eventId, user.id);
+            deleteEvent(token, eventId, user.id);
           } else {
             console.error("Detalles del evento o ID de usuario no están disponibles");
           }
@@ -308,6 +309,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 10,
   },
+  backButton: {
+    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButtonText: {
+    fontSize: 18,
+    color: '#007bff',
+    fontWeight: 'bold',
+  }
 });
 
 export default Admin;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getMaxCapacity, enrollmentEvent} from '../../services/events';
-import { View, Text, StyleSheet,FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet,FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';  // Importamos el hook
 
 const Inscription = ( {route}) =>
@@ -17,12 +17,13 @@ const Inscription = ( {route}) =>
         if (!payload) {
           throw new Error('Invalid token');
         }
+    
         const base64Url = payload.replace(/_/g, '/').replace(/-/g, '+');
         const base64 = atob(base64Url);
         const user = JSON.parse(base64);
         return user;
       } catch (error) {
-        console.error('Manual token decoding error:', error);
+        console.error('Token decoding error:', error);
         return null;
       }
     };
@@ -38,7 +39,7 @@ const Inscription = ( {route}) =>
           if (Array.isArray(events)) {
             const validatedEvents = await Promise.all(events.map(async (event) => {
               try {
-                const isValid = await getMaxCapacity(parseInt(event.id_event_location));
+                const isValid = await getMaxCapacity(token, parseInt(event.id_event_location));
                 return isValid ? event : null;
               } catch (error) {
                 console.error(`Error validando evento ${event.name}:`, error);
@@ -71,9 +72,13 @@ const Inscription = ( {route}) =>
         try
         {
           const response = await enrollmentEvent(storedToken,idEvent,user.id);
+          Alert.alert('Inscripto exitosamente')
         }
         catch(e)
-        { console.log(e)}
+        { 
+          Alert.alert('No se pudo inscribir al usuario en el evento')
+          console.log(e)
+        }
     }
 
     return (
@@ -84,6 +89,7 @@ const Inscription = ( {route}) =>
       >
         <Text style={styles.backButtonText}>Volver</Text>
         </TouchableOpacity>
+        <Text style= {styles.title}>Inscribirse</Text>
         {filteredEvents.length === 0 ? (
           <Text style={styles.emptyText}>No hay eventos disponibles.</Text>
         ) : (
@@ -157,4 +163,21 @@ const styles = StyleSheet.create({
       textAlign: 'center',
       marginTop: 20,
     },
+    backButton: {
+      marginBottom: 20,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    backButtonText: {
+      fontSize: 18,
+      color: '#007bff',
+      fontWeight: 'bold',
+    },
+    title: {
+      fontSize: 24, 
+      fontWeight: 'bold', 
+      color: '#333', 
+      textAlign: 'center', 
+      marginBottom: 20,
+    }
 })
