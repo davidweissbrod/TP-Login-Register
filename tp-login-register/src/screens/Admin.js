@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, ScrollView } from 'react-native';
 import {getEvents, eventDetail, getParticipants, deleteEvent} from '../../services/events';
 import { useNavigation } from '@react-navigation/native'; 
 import moment from 'moment';
@@ -118,81 +118,93 @@ const Admin = ({ route }) => {
   );
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.backButtonText}>Volver</Text>
-      </TouchableOpacity>
-      <Text style={styles.sectionTitle}>Eventos Vigentes</Text>
-      <FlatList
-        data={currentEvents}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => renderEvent(item, true)}
-      />
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
 
-      <Text style={styles.sectionTitle}>Eventos Pasados</Text>
-      <FlatList
-        data={pastEvents}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => renderEvent(item, false)}
-      />
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backButtonText}>Volver</Text>
+        </TouchableOpacity>
 
-     
-<Modal
-  visible={detailsModalVisible}
-  onRequestClose={() => setDetailsModalVisible(false)}
-  animationType="slide"
-  transparent={true}
->
-  <View style={styles.modalBackground}>
-    <View style={styles.modalContainer}>
-      <Text style={styles.modalTitle}>Detalle del Evento</Text>
-    
-        <Text style={styles.modalBody}>
-          {JSON.stringify(detailsContent, null, 2)}
-        </Text>
-     
+        <Text style={styles.sectionTitle}>Eventos Vigentes</Text>
+        <FlatList
+          data={currentEvents}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => renderEvent(item, true)}
+        />
 
-      <TouchableOpacity 
-        onPress={() => {
-          if (eventId && user.id) {
-            deleteEvent(token, eventId, user.id);
-          } else {
-            console.error("Detalles del evento o ID de usuario no están disponibles");
-          }
-        }} 
-        style={styles.closeButton}>
-        <Text style={styles.buttonText}>Eliminar</Text>
-      </TouchableOpacity>
+        <Text style={styles.sectionTitle}>Eventos Pasados</Text>
+        <FlatList
+          data={pastEvents}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => renderEvent(item, false)}
+        />
 
-      <TouchableOpacity onPress={() => setDetailsModalVisible(false)} style={styles.closeButton}>
-        <Text style={styles.buttonText}>Cerrar</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-</Modal>
+        <Modal
+          visible={detailsModalVisible}
+          onRequestClose={() => setDetailsModalVisible(false)}
+          animationType="slide"
+          transparent={true}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Detalle del Evento</Text>
+              <Text style={styles.modalBody}>
+                {JSON.stringify(detailsContent, null, 2)}
+              </Text>
 
-    
-      <Modal
-        visible={participantsModalVisible}
-        onRequestClose={() => setParticipantsModalVisible(false)}
-        animationType="slide"
-        transparent={true}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Participantes</Text>
-            <FlatList
-              data={participantsContent}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => <Text style={styles.modalText}>{item}</Text>}
-            />
-            <TouchableOpacity onPress={() => setParticipantsModalVisible(false)} style={styles.closeButton}>
-              <Text style={styles.buttonText}>Cerrar</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  if (eventId && user.id) {
+                    deleteEvent(token, user.id, eventId);
+                  } else {
+                    console.error("Detalles del evento o ID de usuario no están disponibles");
+                  }
+                }}
+                style={styles.closeButton}
+              >
+                <Text style={styles.buttonText}>Eliminar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setDetailsModalVisible(false)}
+                style={styles.closeButton}
+              >
+                <Text style={styles.buttonText}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+
+        <Modal
+          visible={participantsModalVisible}
+          onRequestClose={() => setParticipantsModalVisible(false)}
+          animationType="slide"
+          transparent={true}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Participantes</Text>
+              <FlatList
+                data={participantsContent}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                  <Text style={styles.modalText}>{item}</Text>
+                )}
+              />
+              <TouchableOpacity
+                onPress={() => setParticipantsModalVisible(false)}
+                style={styles.closeButton}
+              >
+                <Text style={styles.buttonText}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </ScrollView>
   );
 };
 

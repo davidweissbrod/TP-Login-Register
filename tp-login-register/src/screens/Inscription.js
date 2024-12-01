@@ -49,10 +49,10 @@ const Inscription = ( {route}) =>
             const filteredValidEvents = validatedEvents.filter(event => event !== null);
             setFilteredEvents(filteredValidEvents);
           } else {
-            console.warn("Los datos no son un array válido");
+            console.warn("Los datos no son un array");
           }
         } else {
-          console.warn("No se encontraron eventos en AsyncStorage");
+          console.warn("No se encontraron eventos");
         }
       } catch (e) {
         console.error("Error al leer los eventos filtrados:", e);
